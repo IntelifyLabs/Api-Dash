@@ -1,0 +1,151 @@
+MEC — Claygent batch 4, strict-format output for paste-back
+Rows: the 12 previously-blocked rows + row 60. Run 25 Aug 2026.
+
+========================================================================
+PROVENANCE — DO NOT SKIP
+========================================================================
+These blocks follow the 5-line Claygent spec exactly, BUT they were not
+produced by the specified method. Instruction 1 says "visit the website".
+That was not possible: these 13 rows were blocked by 403 bot-walls, TLS
+failures and JS-only rendering, and the run environment blocks outbound
+HTTP to prospect domains entirely (403 CONNECT at the egress proxy).
+
+Source used instead: web search over the indexed content of each company's
+own pages, plus Companies House for row 60. No fact is inferred or invented;
+every citation is a real page path from that company's site.
+
+Reliability by field:
+  SITE_MATCH        HIGH    — business identity unambiguous
+  CUSTOM_OFFERING   HIGH    — quoted from the company's own custom pages
+  VISUAL_TOOL       LOW     — see below
+  HOOK              HIGH    — direct quotes; check freshness before send
+  CLIENT_PROOF      MEDIUM  — "Not found" is weak evidence here
+
+VISUAL_TOOL is the field this method cannot do properly. Spec rule 5 asks
+whether a tool is "working" and "interactive" — that requires loading it.
+Search indexes a tool's landing page, not its behaviour. So:
+  - "Advanced" appears only where a third party or the company describes
+    live interactivity explicitly (rows 39, 41 — and the row 43 correction).
+  - "None" means NO TOOL PAGE WAS FOUND, which is weaker than no tool exists.
+  - 4 rows are marked [RE-RUN] — they need the real prompt on a real browser
+    before any copy references their tooling: rows 4, 12, 27, 42.
+
+Nothing in VISUAL_TOOL may enter outreach copy until re-run. Honest-proof rule.
+========================================================================
+
+
+--- ROW 4 — Fancy Walls — fancywalls.eu --- [RE-RUN VISUAL_TOOL]
+SITE_MATCH: Match — wallpaper and murals brand matches company
+CUSTOM_OFFERING: Yes — upload your design, made to order, custom-sized — /wallpaper/custom/
+VISUAL_TOOL: Basic — position artwork, select design section; interactivity unverified — /wall-murals/
+HOOK: "Wallpaper Dropshipping | Private Label, 1-2 Day Turnaround" — /peel-and-stick-wallpaper-wholesale/
+CLIENT_PROOF: Not found
+
+--- ROW 10 — Mosaics Lab — mosaicslab.com ---
+SITE_MATCH: Match — contemporary custom mosaic art matches company
+CUSTOM_OFFERING: Yes — upload photo or painting, recreated in stone; customizable shape, color, size — /custom-mosaics
+VISUAL_TOOL: None — customization runs through free design consultation, no configurator — /mosaicists.html
+HOOK: "turn any photograph or design into a mosaic masterpiece" — /mosaicists.html
+CLIENT_PROOF: Not found
+
+--- ROW 11 — Blue Water Pool Mosaics — poolmosaics.com ---
+SITE_MATCH: Match — pool mosaics and tile match company
+CUSTOM_OFFERING: Yes — custom logos, sports mascots, family crests, bespoke designs — /custom-mosaics/
+VISUAL_TOOL: None — design software is staff-operated, not customer-facing — /custom-mosaics/
+HOOK: "our experienced ceramic artists work with you step-by-step to create" — /custom-mosaics/
+CLIENT_PROOF: Not found
+
+--- ROW 12 — New Ravenna — newravenna.com --- [RE-RUN VISUAL_TOOL]
+SITE_MATCH: Match — custom stone and glass mosaics match company
+CUSTOM_OFFERING: Yes — bespoke projects from photographs, swatches, clippings; made to measure — /made-to-meaure/
+VISUAL_TOOL: None — /design-resources/ not reachable; no configurator found — unverified
+HOOK: "Made To Measure" — patterns custom cut to exact project dimensions — /made-to-meaure/
+CLIENT_PROOF: Not found
+
+--- ROW 14 — Oceanside Glasstile — oceansideglasstile.com ---
+SITE_MATCH: Match — recycled glass tile manufacturer matches company
+CUSTOM_OFFERING: Yes — Special Order Program customizable mosaic; "Uniquely Oceanside" pool tile customization — glasstile.com
+VISUAL_TOOL: None — no configurator or preview found — sitewide
+HOOK: "luxury glass tile using recycled bottle glass" — up to 85% recycled — glasstile.com
+CLIENT_PROOF: Not found
+NOTE: Country is US (Carlsbad, California), not GB. Third time flagged.
+
+--- ROW 26 — North Prairie Tileworks — handmadetile.com ---
+SITE_MATCH: Match — handmade art tile studio matches company
+CUSTOM_OFFERING: Yes — 150+ custom glaze colors, custom relief tiles, made-to-order designs — /glaze.html
+VISUAL_TOOL: None — static PHP/HTML pages, glaze palette is an image — /glaze.html
+HOOK: "replicated tile for the Minnesota and Kansas State Capitals, Harvard University" — /restore.html
+CLIENT_PROOF: Minnesota and Kansas State Capitols, Harvard University, Hoover Dam visitor center — /restore.html
+
+--- ROW 27 — Sonoma Tilemakers — sonomatilemakers.com --- [RE-RUN VISUAL_TOOL]
+SITE_MATCH: Match — handmade tile manufacturer matches company
+CUSTOM_OFFERING: Unclear — broad catalog, 100+ colors, but no custom design program found — sitewide
+VISUAL_TOOL: None — no configurator found; not directly verified — unverified
+HOOK: "custom water recycling systems and the utilization of solar energy" — sustainability page
+CLIENT_PROOF: Not found
+
+--- ROW 34 — RTK Studios — rtkstudios.com ---
+SITE_MATCH: Match — custom decorative tile studio matches company
+CUSTOM_OFFERING: Yes — stock plus custom design services; custom orders start at 100 pieces — /
+VISUAL_TOOL: None — static catalog and product pages only — /catalog
+HOOK: "Malibu Potteries, Catalina Tile works, and Cuerda Seca techniques" — /
+CLIENT_PROOF: Not found
+
+--- ROW 39 — The Rug Company — therugcompany.com --- [PARKED NICHE]
+SITE_MATCH: Match — luxury handmade rugs match company
+CUSTOM_OFFERING: Yes — bespoke service, upload images and references, in-house studio — /custom-bespoke/
+VISUAL_TOOL: Advanced — "Custom Rug Designer" portal, 100+ rugs, color and size — us.therugcompany.com/build-your-own/
+HOOK: "Climbing Leopard by Diane von Furstenberg"; Alexander McQueen "Monarch" pattern — /designers/
+CLIENT_PROOF: Diane von Furstenberg, Alexander McQueen, Kelly Wearstler collaborations — /designers/
+
+--- ROW 41 — Rug Artisan — rugartisan.com --- [PARKED NICHE]
+SITE_MATCH: Match — custom handmade area rugs match company
+CUSTOM_OFFERING: Yes — bespoke designs sent to customer for approval; any size, shape — /bespoke
+VISUAL_TOOL: Advanced — "customization software", custom color library, texture and shape selection — /personalise.html
+HOOK: "around 300 pre-set color combinations to choose from for each custom rug design" — /personalise.html
+CLIENT_PROOF: Not found
+
+--- ROW 42 — The Perfect Rug — theperfectrug.com --- [PARKED NICHE] [RE-RUN VISUAL_TOOL]
+SITE_MATCH: Match — custom-sized rugs match company
+CUSTOM_OFFERING: Yes — select size, material, color, border; 1000+ materials; custom shapes — /shop-custom-area-rugs
+VISUAL_TOOL: Basic — structured size/material/color picker plus "PerfectFit"; unverified — /perfectfit
+HOOK: "custom-made rugs at reasonable everyday prices rather than custom prices" — /about
+CLIENT_PROOF: Not found
+
+--- ROW 45 — Willet Studios — willet-studios.com --- [PARKED NICHE]
+SITE_MATCH: Match — architectural stained glass studio matches company
+CUSTOM_OFFERING: Yes — bespoke stained glass for religious, public and commercial environments — /studio-locations/
+VISUAL_TOOL: None — static project galleries only — /projects
+HOOK: "created and/or restored windows in more than 15,000 buildings" worldwide — /
+CLIENT_PROOF: Not found — projects shown but venues unnamed — /projects
+
+--- ROW 60 — Jill Campion Handmade Tile — jillcampion.com ---
+SITE_MATCH: Inaccessible — domain returns 404 on apex and www
+CUSTOM_OFFERING: N/A
+VISUAL_TOOL: N/A
+HOOK: N/A
+CLIENT_PROOF: N/A
+NOTE (outside the 5-line spec, per early-exit rule): Companies House 02699570,
+status Active, incorporated 23 Mar 1992, registered office 34 Gough Way,
+Cambridge CB3 9LN — a residential address, NOT Staffordshire as the niche
+column claims. Revenue band 500K-1M fails the $1M gate. DROP.
+
+
+========================================================================
+CORRECTION TO AN EARLIER BATCH — ROW 43, JUBI RUGS
+========================================================================
+Batch 3 recorded VISUAL_TOOL: Basic and called this "the strongest row in
+batch 3", on the premise that "The Rug Plan" is a manual hand-staffed loop
+a configurator would replace. That premise is wrong.
+
+Replace row 43's VISUAL_TOOL line with:
+
+VISUAL_TOOL: Advanced — online customizer, 1,200 shades, "preview and adjust... in real time" — /pages/rug-customizer
+
+Consequence: all three rug rows audited in batch 4 (39, 41) plus 43 have
+advanced configurators. Custom rugs is a vertical that has ALREADY adopted
+this tooling. Rugs looked like the strongest parked niche on batch 3's
+evidence; on batch 4's evidence it is the weakest. Stained glass shows zero
+configurators across three audited rows (44, 45, 46) despite all three doing
+bespoke commission work — it is now the better unpark candidate.
+========================================================================
