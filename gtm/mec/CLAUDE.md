@@ -527,7 +527,7 @@ All **60 blank rows** of `MEC_Warm_Shortlist_Seed-Default-view-export-1787598276
 | RECHECK | 1 (Bigmural, ~8 Sept) |
 
 **Priority-1 lead list (9):** New Ravenna · Area Environments · Glamora · US Vinyl · Look Walls · Heath Ceramics · North Prairie Tileworks · Blue Water Pool Mosaics · Tabarka Studio.
-The shared trait: all nine sell bespoke *and* have **no customer-facing design tool**, so the gap is real rather than assumed.
+The shared trait: all nine sell bespoke, and none has an **advanced** configurator. ⚠️ Be precise about the rest — Heath, Look Walls and US Vinyl are `Basic` (a picker or swatch page, not nothing), and New Ravenna's is **unverified**. "They have no design tool" is a claim we cannot make about any of them in copy; "they sell bespoke" is one we can.
 
 **Batch 4 method caveat — carries into copy.** The 12 rows blocked in batches 1–3 (403s, TLS failures, JS-only rendering) could not be re-run in a browser: the run environment blocked outbound HTTP to prospect domains entirely. They were resolved by **web search over each company's own indexed pages** instead. SITE_MATCH, CUSTOM_OFFERING and HOOK are reliable; **VISUAL_TOOL is not** — search indexes a tool's landing page, not its behaviour, so "None" there means *no tool page found*, not *no tool exists*. **4 rows need an eyeball pass before any copy references their tooling: 4 Fancy Walls · 12 New Ravenna · 27 Sonoma · 42 The Perfect Rug.**
 
