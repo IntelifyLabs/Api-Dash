@@ -1,0 +1,628 @@
+<title>Concept to Yes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --ground:#EFF1F2; --surface:#FFFFFF; --surface-2:#F6F8F8;
+  --ink:#10171A; --ink-2:#4C5C63; --ink-3:#71838A;
+  --line:#D6DCDE; --line-2:#E8ECED;
+  --accent:#0D6E79; --accent-ink:#0A555E; --accent-soft:#DFEFF1;
+  --clay:#A84C28; --clay-ink:#8A3D1F; --clay-soft:#F8E8E1;
+  --gold:#7E6120; --gold-soft:#F2EBD8;
+  --shadow:0 1px 2px rgba(16,23,26,.06),0 8px 24px -12px rgba(16,23,26,.18);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1315; --surface:#141C1F; --surface-2:#1A2427;
+    --ink:#E9EEEF; --ink-2:#9BABB1; --ink-3:#7A8B91;
+    --line:#293538; --line-2:#1F2A2D;
+    --accent:#54C6D1; --accent-ink:#7FD8E1; --accent-soft:#0F3439;
+    --clay:#E28A5F; --clay-ink:#EDA484; --clay-soft:#331A10;
+    --gold:#D2B269; --gold-soft:#2B2413;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1315; --surface:#141C1F; --surface-2:#1A2427;
+  --ink:#E9EEEF; --ink-2:#9BABB1; --ink-3:#7A8B91;
+  --line:#293538; --line-2:#1F2A2D;
+  --accent:#54C6D1; --accent-ink:#7FD8E1; --accent-soft:#0F3439;
+  --clay:#E28A5F; --clay-ink:#EDA484; --clay-soft:#331A10;
+  --gold:#D2B269; --gold-soft:#2B2413;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:53rem;margin:0 auto;padding:0 1.5rem 6rem}
+
+/* ---------- masthead ---------- */
+header.mast{padding:4.5rem 0 2rem}
+.tesserae{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;height:14px;margin-bottom:2rem}
+.tesserae i{background:var(--accent);border-radius:1px;display:block}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 1rem
+}
+h1{
+  font-family:Spectral,Georgia,serif;font-weight:700;font-size:clamp(2.6rem,7vw,4rem);
+  line-height:1.02;letter-spacing:-.02em;margin:0 0 1rem;text-wrap:balance
+}
+.standfirst{font-family:Spectral,Georgia,serif;font-size:1.2rem;line-height:1.55;color:var(--ink-2);max-width:38rem;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:1.5rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--line)}
+.meta div{display:flex;flex-direction:column;gap:.15rem}
+.meta dt{font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.meta dd{margin:0;font-size:.9rem;font-weight:500}
+
+/* ---------- structure ---------- */
+section{margin-top:4rem}
+.sec-head{display:flex;align-items:baseline;gap:.9rem;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:2px solid var(--ink)}
+.sec-num{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--accent);font-weight:500;letter-spacing:.06em}
+h2{font-family:Spectral,Georgia,serif;font-size:1.9rem;font-weight:600;line-height:1.15;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h3{font-family:Spectral,Georgia,serif;font-size:1.3rem;font-weight:600;margin:2.5rem 0 .75rem;line-height:1.25;text-wrap:balance}
+h4{font-size:.75rem;font-family:"IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:2rem 0 .6rem;font-weight:500}
+p{margin:0 0 1rem;max-width:40rem}
+a{color:var(--accent-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:600}
+em{font-style:italic}
+
+/* ---------- callouts ---------- */
+.note{
+  border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:1.1rem 1.3rem;margin:1.5rem 0;border-radius:0 4px 4px 0
+}
+.note.warn{border-left-color:var(--clay);background:var(--clay-soft)}
+.note.rule{border-left-color:var(--gold);background:var(--gold-soft)}
+.note p{margin:0 0 .6rem;max-width:none}
+.note p:last-child{margin:0}
+.note .tag{
+  display:block;font-family:"IBM Plex Mono",monospace;font-size:.65rem;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;font-weight:500;color:var(--accent-ink)
+}
+.note.warn .tag{color:var(--clay-ink)}
+.note.rule .tag{color:var(--gold)}
+
+/* ---------- compare (was / is) ---------- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:1.5rem 0}
+.compare>div{background:var(--surface);padding:1.2rem 1.3rem}
+.compare h5{margin:0 0 .7rem;font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.compare .was h5{color:var(--clay-ink)}
+.compare .is h5{color:var(--accent-ink)}
+.compare p{font-size:.92rem;margin:0;max-width:none;color:var(--ink-2)}
+.compare .is p{color:var(--ink)}
+@media(max-width:640px){.compare{grid-template-columns:1fr}}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:1.5rem 0;border:1px solid var(--line);border-radius:5px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:34rem}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line-2);vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;background:var(--surface-2);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums}
+
+/* ---------- prospect card ---------- */
+.prospect{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.4rem 1.5rem;margin:1.5rem 0;box-shadow:var(--shadow)}
+.prospect .name{font-family:Spectral,Georgia,serif;font-size:1.35rem;font-weight:600;margin:0 0 .2rem}
+.prospect .who{font-size:.9rem;color:var(--ink-2);margin:0 0 1rem}
+.facts{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.chip{
+  font-family:"IBM Plex Mono",monospace;font-size:.68rem;padding:.2rem .5rem;
+  border:1px solid var(--line);border-radius:3px;color:var(--ink-2);background:var(--surface-2)
+}
+.chip.hot{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.chip.risk{border-color:var(--clay);color:var(--clay-ink);background:var(--clay-soft)}
+
+/* ---------- copy blocks ---------- */
+.msg{border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:1.2rem 0;background:var(--surface)}
+.msg-head{
+  display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;padding:.6rem .9rem;
+  background:var(--surface-2);border-bottom:1px solid var(--line)
+}
+.msg-head .k{font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.msg-head .v{font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--ink);font-weight:500}
+.msg-head .count{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:.68rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.blk{display:grid;grid-template-columns:8.5rem 1fr;gap:0;border-bottom:1px solid var(--line-2)}
+.blk:last-child{border-bottom:none}
+.blk .lab{
+  font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent-ink);padding:.95rem .8rem;background:var(--surface-2);
+  border-right:1px solid var(--line-2);line-height:1.4
+}
+.blk .txt{
+  font-family:"IBM Plex Mono",monospace;font-size:.86rem;line-height:1.65;
+  padding:.9rem 1rem;white-space:pre-wrap;color:var(--ink)
+}
+@media(max-width:640px){
+  .blk{grid-template-columns:1fr}
+  .blk .lab{border-right:none;border-bottom:1px solid var(--line-2);padding:.5rem .8rem}
+}
+
+/* ---------- list ---------- */
+ul.clean{list-style:none;padding:0;margin:1rem 0;display:flex;flex-direction:column;gap:.6rem;max-width:40rem}
+ul.clean li{padding-left:1.2rem;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;background:var(--accent);border-radius:1px}
+ol.steps{padding-left:1.2rem;max-width:40rem;display:flex;flex-direction:column;gap:.6rem;margin:1rem 0}
+ol.steps li{padding-left:.3rem}
+
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:.85rem;color:var(--ink-3)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){
+  .tesserae i{animation:fade .7s ease-out backwards}
+  @keyframes fade{from{opacity:0}to{opacity:var(--o)}}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="tesserae" aria-hidden="true">
+    <i style="--o:.9;opacity:.9;animation-delay:.00s"></i><i style="--o:.35;opacity:.35;animation-delay:.02s"></i>
+    <i style="--o:.7;opacity:.7;animation-delay:.04s"></i><i style="--o:.2;opacity:.2;animation-delay:.06s"></i>
+    <i style="--o:.55;opacity:.55;animation-delay:.08s"></i><i style="--o:.9;opacity:.9;animation-delay:.10s"></i>
+    <i style="--o:.25;opacity:.25;animation-delay:.12s"></i><i style="--o:.6;opacity:.6;animation-delay:.14s"></i>
+    <i style="--o:.4;opacity:.4;animation-delay:.16s"></i><i style="--o:.85;opacity:.85;animation-delay:.18s"></i>
+    <i style="--o:.15;opacity:.15;animation-delay:.20s"></i><i style="--o:.7;opacity:.7;animation-delay:.22s"></i>
+    <i style="--o:.5;opacity:.5;animation-delay:.24s"></i><i style="--o:.9;opacity:.9;animation-delay:.26s"></i>
+    <i style="--o:.3;opacity:.3;animation-delay:.28s"></i><i style="--o:.65;opacity:.65;animation-delay:.30s"></i>
+    <i style="--o:.2;opacity:.2;animation-delay:.32s"></i><i style="--o:.8;opacity:.8;animation-delay:.34s"></i>
+    <i style="--o:.45;opacity:.45;animation-delay:.36s"></i><i style="--o:.25;opacity:.25;animation-delay:.38s"></i>
+    <i style="--o:.7;opacity:.7;animation-delay:.40s"></i><i style="--o:.35;opacity:.35;animation-delay:.42s"></i>
+    <i style="--o:.9;opacity:.9;animation-delay:.44s"></i><i style="--o:.5;opacity:.5;animation-delay:.46s"></i>
+  </div>
+
+  <p class="eyebrow">MEC Artworks AI · Outreach copy · 25 Aug 2026</p>
+  <h1>Concept to Yes</h1>
+  <p class="standfirst">Test copy for three prospects, written against what the product actually does — which is not what our own master doc says it does.</p>
+
+  <dl class="meta">
+    <div><dt>Channels</dt><dd>LinkedIn (Shahwaz) → Email (Haroon)</dd></div>
+    <div><dt>Sendable list</dt><dd class="num">42 KEEP rows</dd></div>
+    <div><dt>Frameworks</dt><dd>House 4-block · BAB</dd></div>
+    <div><dt>Status</dt><dd>Touches 1–2 launch-ready</dd></div>
+  </dl>
+</header>
+
+<!-- ============ 1 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>What the product actually is</h2></div>
+
+  <p>I could not reach the Triminage portfolio page from this environment, so I read MEC's own published pages about the tool instead. What they describe does not match §7 of the master doc.</p>
+
+  <div class="compare">
+    <div class="was">
+      <h5>What CLAUDE.md §7 says</h5>
+      <p>“User sets palette, pattern style, tile density and scale → renders mosaic visualisations in real time via canvas-based rendering.”</p>
+      <p style="margin-top:.7rem">A parametric configurator: you move sliders, it redraws.</p>
+    </div>
+    <div class="is">
+      <h5>What AI Mosaic Studio does</h5>
+      <p><strong>Imagine From Scratch</strong> — describe a mosaic <em>in everyday words</em>; the AI generates an original concept from your colour, subject, mood and material. “You don't need to draw. You don't need CAD experience.”</p>
+      <p style="margin-top:.7rem"><strong>Customize Your Space</strong> — upload a photo of the actual room, choose the surface, generate a preview of the mosaic in place.</p>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">Why this matters</span>
+    <p>The copy I wrote earlier pitched a slider-based configurator. It would have described the wrong product to a prospect who then clicked through and saw something else — the fastest way to lose a technical buyer's trust.</p>
+    <p><strong>Someone should reconcile §7 of the master doc against the live app.</strong> Either the product moved from canvas rendering to generative AI, or the doc recorded the build stack and not the user experience. Until that is settled, treat the copy below as authoritative and §7 as stale.</p>
+  </div>
+
+  <h3>The real pitch, in one line</h3>
+  <p>A client describes what they want in ordinary language and sees it on a photograph of their own wall — before anyone quotes, samples or fabricates.</p>
+
+  <h4>Access terms — these are the CTA</h4>
+  <ul class="clean">
+    <li><strong>Free.</strong> Five high-resolution previews.</li>
+    <li><strong>Email verification only</strong> — a one-time code. No password to create, no subscription to manage.</li>
+    <li>Uploads accept JPEG, PNG, WebP up to 10&nbsp;MB.</li>
+  </ul>
+  <p>“No password, no subscription” is worth saying out loud. It removes the objection the reader forms while reading the sentence.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>The problem nobody has raised yet</h2></div>
+
+  <p><strong>ai.mecartworks.com is MEC Artworks' own lead-generation asset.</strong> It is their brand, it captures emails, and it feeds their custom mosaic business. MEC Artworks is a mosaic company — and §7.2 lists five of our prospects as <em>direct MEC competitors</em>: New Ravenna, Artistic Tile, Aqua Blu Mosaics, Hakatai, Blue Water Pool Mosaics.</p>
+
+  <div class="note warn">
+    <span class="tag">Open question for Abdullah — new</span>
+    <p>Abdullah dropped the competitor concern, but that answer was about whether we may <em>target</em> MEC's competitors. This is the opposite direction: are we comfortable sending a rival mosaic firm to a competitor's branded, email-gated tool and asking them to register?</p>
+    <p>They will recognise MEC within seconds. Handled badly it reads as careless. Handled deliberately it is a strong pitch — <em>“a mosaic house your size built this; we built it for them”</em> — but it has to be a choice, not an accident.</p>
+  </div>
+
+  <h3>How the copy below handles it</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Segment</th><th>Competitor of MEC?</th><th>CTA used</th></tr></thead>
+      <tbody>
+        <tr><td>Mosaic / pool / artisan tile</td><td>Yes — direct</td><td><strong>No raw link.</strong> Offer a walkthrough or screen recording. Name MEC openly as our client rather than letting them discover it</td></tr>
+        <tr><td>Murals &amp; wallcoverings</td><td>No — different product</td><td>Send the link. “Free, five previews, no signup wall”</td></tr>
+        <tr><td>Ceramic tile (catalogue-led)</td><td>Partly</td><td>Judgement per row. Default to the walkthrough</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">03</span><h2>Which frameworks, and why</h2></div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Framework</th><th>Verdict</th><th>Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>House 4-block</strong><br><span style="color:var(--ink-3);font-size:.85em">Observation → Consequence → Proof → CTA</span></td><td><strong style="color:var(--accent-ink)">Variant A</strong></td><td>Standing rule 13, and the designed fix for Campaign 2's failure. It is still unproven, so it has to be the primary</td></tr>
+        <tr><td><strong>BAB</strong><br><span style="color:var(--ink-3);font-size:.85em">Before → After → Bridge</span></td><td><strong style="color:var(--accent-ink)">Variant B</strong></td><td>The only framework whose middle step is satisfied by a working link. “After” is a thing we can show instead of claim</td></tr>
+        <tr><td>AIDA</td><td>Reject</td><td>“Desire” needs a claim that makes them want it. MEC has no published performance figures — manufacturing desire means inventing proof</td></tr>
+        <tr><td>PAS</td><td>Reject</td><td>“Agitate” means telling a stranger their pain is worse than they think. We did that with Jubi and were wrong. Do not agitate an assumed pain</td></tr>
+        <tr><td>QVC · SPIN · sniper</td><td>Hold</td><td>A cold question invites “no”; SPIN needs dialogue; sniper is for the 200+ headcount rows</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note rule">
+    <span class="tag">Standing rule 13 needs a MEC carve-out</span>
+    <p>Rule 13 sets block 3 as <strong>“CureMD proof.”</strong> Correct for the healthcare campaigns. Wrong here — quoting 98% note accuracy from a medical-scribe build to a tile studio reads like a stock agency deck. <strong>For MEC, block 3 is the tool itself.</strong></p>
+  </div>
+
+  <h3>What we may and may not say</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Safe — publicly verifiable</th><th>Never</th></tr></thead>
+      <tbody>
+        <tr><td>Describe a mosaic in plain words, get an original concept</td><td>Any percentage, hours saved, or conversion figure</td></tr>
+        <tr><td>Upload a room photo, choose a surface, preview in place</td><td>Any named MEC customer</td></tr>
+        <tr><td>Five free previews · email code · no password or subscription</td><td>CureMD's figures — wrong client, wrong campaign</td></tr>
+        <tr><td>Built by Triminage in 7 weeks with a team of 3 <span style="color:var(--ink-3)">(per §0; I could not re-verify the portfolio page)</span></td><td>That we know their internal process — we know their <em>website</em></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">The Jubi rule</span>
+    <p>Never assert a prospect does something <em>by hand</em> or <em>lacks</em> a tool. We were wrong once, on the best-researched name in the file. Every observation below comes from their own site copy or their contact's job title — never from what we assume happens inside.</p>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">04</span><h2>New Ravenna</h2></div>
+
+  <div class="prospect">
+    <p class="name">New Ravenna</p>
+    <p class="who">Stephenie Wilkins — <strong>Concept Board Team Manager</strong> — swilkins@newravenna.com</p>
+    <div class="facts">
+      <span class="chip">Row 12</span><span class="chip">Mosaic / Pool</span><span class="chip num">$10–25M</span>
+      <span class="chip">Exmore, VA</span><span class="chip hot">Priority 1</span><span class="chip risk">Direct MEC competitor</span>
+    </div>
+    <p style="margin:0;font-size:.93rem;color:var(--ink-2)">They employ a <em>manager</em> whose job title is the approval step we sell into. That is not an inference — it is on her LinkedIn. Strongest observation in the file.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">CTA changed for this row</span>
+    <p>No raw link. New Ravenna is a $10–25M mosaic house; MEC is a mosaic house. Asking them to hand an email to a competitor's tool is the wrong ask. We name MEC as our client up front and offer to walk them through it instead.</p>
+  </div>
+
+  <h4>Subject lines</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Touch</th><th>Subject</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><code>your concept board team</code></td><td>Names her actual team. Cannot be mistaken for a blast</td></tr>
+      <tr><td class="num">2</td><td><code>describing it in plain words</code></td><td>The new specific thing — how the tool actually works</td></tr>
+      <tr><td class="num">3</td><td><code>closing this out</code></td><td>Honest breakup, no manufactured urgency</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant A</span><span class="v">your concept board team</span><span class="count">86 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Stephenie — my colleague Shahwaz reached out on LinkedIn recently, so I'll keep this short.</div></div>
+    <div class="blk"><div class="lab">1 · Observation</div><div class="txt">New Ravenna turns client photographs and fabric swatches into mosaic concepts before anything is cut. You have a team manager for that step, which says it carries real weight.</div></div>
+    <div class="blk"><div class="lab">2 · Consequence</div><div class="txt">That first pass is usually where custom work stalls — not fabrication.</div></div>
+    <div class="blk"><div class="lab">3 · Proof</div><div class="txt">We built the AI studio MEC Artworks runs. A client types what they want in plain words, uploads a photo of the room, and sees the mosaic on their own wall.</div></div>
+    <div class="blk"><div class="lab">4 · CTA</div><div class="txt">Happy to walk you through it — worth a look?</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant B · BAB</span><span class="v">before the client says yes</span><span class="count">84 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Stephenie — Shahwaz messaged you on LinkedIn recently; short version here.</div></div>
+    <div class="blk"><div class="lab">Before</div><div class="txt">A concept board goes out, then there's a wait — feedback, a revision, another board, and a client who can still change direction.</div></div>
+    <div class="blk"><div class="lab">After</div><div class="txt">Now imagine they describe the change in a sentence and see it on a photo of their own wall while you're still talking.</div></div>
+    <div class="blk"><div class="lab">Bridge</div><div class="txt">That's what we built for MEC Artworks. I can show you the working version — want me to?</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 2 · +3–4 days</span><span class="v">describing it in plain words</span></div>
+    <div class="blk"><div class="lab">New specific</div><div class="txt">Stephenie — the part I should have led with.
+
+There's no drawing and no CAD in it. Someone types "warm terracotta, geometric, Moorish influence" and gets an original concept back. Then they upload a photo of the wall and see it in place.
+
+The reason I think it's relevant to a concept board team: it doesn't replace the board, it gets the client to a direction before the board is worth making.
+
+Fifteen minutes on a call and you'll know whether that's useful or not.</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 3 · +4–5 days</span><span class="v">closing this out</span></div>
+    <div class="blk"><div class="lab">Soft breakup</div><div class="txt">Stephenie — I'll leave this alone now.
+
+If the concept stage is already as fast as you want it, that's a good place to be and I'm glad I asked.
+
+If it ever becomes the bottleneck — usually when volume climbs rather than when the work itself changes — we're easy to find.
+
+Thanks for reading this far.</div></div>
+  </div>
+
+  <h4>LinkedIn — Shahwaz</h4>
+  <div class="msg">
+    <div class="msg-head"><span class="k">Invite note</span><span class="count">251 / 280 chars</span></div>
+    <div class="blk"><div class="lab">Note</div><div class="txt">Hi Stephenie — your title caught my eye. Having a manager dedicated to concept boards says a lot about how much of New Ravenna's work happens before a client says yes. That step is what I spend my time on. Would like to follow what your team puts out.</div></div>
+  </div>
+  <div class="msg">
+    <div class="msg-head"><span class="k">DM on accept</span></div>
+    <div class="blk"><div class="lab">Message</div><div class="txt">Thanks for connecting, Stephenie.
+
+I'll be straight about who I am: we're the studio that built the AI mosaic tool MEC Artworks runs. They're in your industry, so I'd rather say that up front than have you find it.
+
+What it does: a client describes a mosaic in ordinary words — colour, mood, subject — and gets an original concept. Then they upload a photo of the actual room and see it on the wall.
+
+It's aimed at the stage before a concept board is worth making. Given your team owns exactly that step, I'd value your read on it more than most people's.
+
+Want me to walk you through it?</div></div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">05</span><h2>Area Environments</h2></div>
+
+  <div class="prospect">
+    <p class="name">Area Environments</p>
+    <p class="who">Heather Neurer — Design Manager — hneurer@areaenvironments.com</p>
+    <div class="facts">
+      <span class="chip">Row 54</span><span class="chip">Murals &amp; wallcoverings</span><span class="chip num">$1–5M</span>
+      <span class="chip hot">Priority 1</span><span class="chip hot">Trade-only</span><span class="chip">Not a competitor</span>
+    </div>
+    <p style="margin:0;font-size:.93rem;color:var(--ink-2)">Highest tool-gap-to-need ratio in the file. Trade-only — §7.4's strongest free signal — plus an explicit upload-your-own-artwork offer. Findings came from a direct site visit, so they're solid.</p>
+  </div>
+
+  <h4>Subject lines</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Touch</th><th>Subject</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><code>bring your own artwork</code></td><td>Their own FAQ language, quoted back</td></tr>
+      <tr><td class="num">2</td><td><code>five previews, no signup wall</code></td><td>States the exact cost of acting</td></tr>
+      <tr><td class="num">3</td><td><code>last note from me</code></td><td>Clean exit</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant A</span><span class="v">bring your own artwork</span><span class="count">89 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Heather — my colleague Shahwaz reached out on LinkedIn recently, so I'll keep this short.</div></div>
+    <div class="blk"><div class="lab">1 · Observation</div><div class="txt">Your FAQ says if someone brings a piece or a photograph, Area will build the wallcovering around it. That's a real offer, and trade-only — so a designer specifies it to a client waiting on the other side.</div></div>
+    <div class="blk"><div class="lab">2 · Consequence</div><div class="txt">Right now that client approves from a sample and their imagination.</div></div>
+    <div class="blk"><div class="lab">3 · Proof</div><div class="txt">We built a tool for MEC Artworks where you upload a photo of the room and see the design on the actual wall. It's free and live.</div></div>
+    <div class="blk"><div class="lab">4 · CTA</div><div class="txt">Want the link?</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant B · BAB</span><span class="v">approving from a sample</span><span class="count">82 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Heather — Shahwaz messaged you on LinkedIn recently; short version.</div></div>
+    <div class="blk"><div class="lab">Before</div><div class="txt">A designer brings artwork to Area, you build the wallcovering around it, and their client signs off from a sample and a lot of trust.</div></div>
+    <div class="blk"><div class="lab">After</div><div class="txt">With a preview, that client sees it on their own wall before anyone commits to a print run.</div></div>
+    <div class="blk"><div class="lab">Bridge</div><div class="txt">We built one for MEC Artworks — free, five previews, no subscription. Send it over?</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 2 · +3–4 days</span><span class="v">five previews, no signup wall</span></div>
+    <div class="blk"><div class="lab">New specific</div><div class="txt">Heather — should have included this first time.
+
+It's at ai.mecartworks.com. An email code gets you five high-resolution previews. No password to create, no subscription.
+
+Upload a photo, describe what you want, pick the surface. Given every Area piece starts with a specific artist's work, the honest test is whether the result looks like something you'd put in front of a designer.
+
+If it doesn't, that's a fair answer and I'll stop here.</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 3 · +4–5 days</span><span class="v">last note from me</span></div>
+    <div class="blk"><div class="lab">Soft breakup</div><div class="txt">Heather — I'll stop here.
+
+Selling to the trade only means your approval cycle runs through someone else's client, which is the hardest version of this to fix from the inside. If Area ever wants to hand designers something they can show live, ai.mecartworks.com is the example.
+
+Either way — paying artists a royalty on every wallcovering sold in their name is a genuinely good thing to see in this industry.</div></div>
+  </div>
+
+  <h4>LinkedIn — Shahwaz</h4>
+  <div class="msg">
+    <div class="msg-head"><span class="k">Invite note</span><span class="count">266 / 280 chars</span></div>
+    <div class="blk"><div class="lab">Note</div><div class="txt">Hi Heather — I read that Area builds a wallcovering around a client's own piece or photograph, and that every artist earns a royalty on what sells in their name. That's a rare way to run it. I work on the design-approval side of this world and would like to connect.</div></div>
+  </div>
+  <div class="msg">
+    <div class="msg-head"><span class="k">DM on accept</span></div>
+    <div class="blk"><div class="lab">Message</div><div class="txt">Thanks for connecting, Heather.
+
+Two things stood out: Area sells to the trade only, and your FAQ says if someone brings a piece, a photograph or a concept, you'll build the wallcovering around it.
+
+So a designer is specifying your work to a client who has to picture the result before approving it.
+
+We built a tool for MEC Artworks that closes that gap — you upload a photo of the room, describe the design in plain words, and see it on the wall. Free, five previews, no subscription.
+
+Worth two minutes on one of your artist collections. Want the link?</div></div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">06</span><h2>US Vinyl Manufacturing</h2></div>
+
+  <div class="prospect">
+    <p class="name">US Vinyl Manufacturing Corp</p>
+    <p class="who">Susan Steinicke — Creative Director — susansteinicke@usvinyl.com</p>
+    <div class="facts">
+      <span class="chip">Row 57</span><span class="chip">Wallcovering / hospitality</span><span class="chip num">$5–10M</span>
+      <span class="chip">La Fayette, GA</span><span class="chip hot">Priority 1</span><span class="chip hot">Live rebrand</span>
+    </div>
+    <p style="margin:0;font-size:.93rem;color:var(--ink-2)">A dated reason to write now: they are mid-rebrand into “USV Wallcovering Murals Graphics”, a stated move beyond hotel standards into art-led work.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">Do not mention</span>
+    <p>Their site runs Joomla over plain HTTP. That is useful context for us and an insult if said aloud. It never appears in copy.</p>
+  </div>
+
+  <h4>Subject lines</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Touch</th><th>Subject</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><code>USV Murals &amp; Graphics</code></td><td>Their own new line name</td></tr>
+      <tr><td class="num">2</td><td><code>a new line has no install photos yet</code></td><td>A real insight about launching</td></tr>
+      <tr><td class="num">3</td><td><code>wrapping up</code></td><td>Clean exit</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant A</span><span class="v">USV Murals &amp; Graphics</span><span class="count">88 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Susan — my colleague Shahwaz reached out on LinkedIn recently, so I'll keep this brief.</div></div>
+    <div class="blk"><div class="lab">1 · Observation</div><div class="txt">USV Murals &amp; Graphics is a different sell from hotel standards. Marriott and Hilton buy to spec. Art-led work gets bought on how it looks in the room.</div></div>
+    <div class="blk"><div class="lab">2 · Consequence</div><div class="txt">That's the harder thing to show from a sample book.</div></div>
+    <div class="blk"><div class="lab">3 · Proof</div><div class="txt">We built a tool for MEC Artworks where a client uploads a photo of the space, describes what they want, and sees it on the wall. Free to try.</div></div>
+    <div class="blk"><div class="lab">4 · CTA</div><div class="txt">For a line that sells on look, might be two minutes well spent.</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 1 · Variant B · BAB</span><span class="v">spec work vs art-led work</span><span class="count">85 words</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">Susan — Shahwaz messaged you on LinkedIn recently; here's the short version.</div></div>
+    <div class="blk"><div class="lab">Before</div><div class="txt">A hotel client picks from a standard and knows exactly what arrives. An art-led mural is the opposite — they're approving something they've never seen at scale.</div></div>
+    <div class="blk"><div class="lab">After</div><div class="txt">With a preview they see it at scale, in their own space, before the print run is committed.</div></div>
+    <div class="blk"><div class="lab">Bridge</div><div class="txt">We built one for MEC Artworks and it's free to try. Want the link?</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 2 · +3–4 days</span><span class="v">a new line has no install photos yet</span></div>
+    <div class="blk"><div class="lab">New specific</div><div class="txt">Susan — one more thought, then I'll leave it.
+
+The reason I think this is relevant to the Murals &amp; Graphics launch specifically: a new creative direction has no back catalogue of installed photography to point at. Showing it live does the job reference images usually do.
+
+It's at ai.mecartworks.com — email code, five previews, no subscription. Upload a space, describe the mural, see it in place.
+
+Two minutes will tell you whether I'm right.</div></div>
+  </div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Touch 3 · +4–5 days</span><span class="v">wrapping up</span></div>
+    <div class="blk"><div class="lab">Soft breakup</div><div class="txt">Susan — last one from me.
+
+Forty years of combined print experience and a client list like yours means you've solved harder problems than this one. If the new line ends up needing a way to show work before it exists, ai.mecartworks.com is the example to look at.
+
+Good luck with the launch either way.</div></div>
+  </div>
+
+  <h4>LinkedIn — Shahwaz</h4>
+  <div class="msg">
+    <div class="msg-head"><span class="k">Invite note</span><span class="count">256 / 280 chars</span></div>
+    <div class="blk"><div class="lab">Note</div><div class="txt">Hi Susan — I saw USV is moving into Murals &amp; Graphics as a new creative direction, beyond the hotel-standard lines. Art-led wallcovering is a different sell from spec work, and that shift is the part I find interesting. Would like to connect and follow it.</div></div>
+  </div>
+  <div class="msg">
+    <div class="msg-head"><span class="k">DM on accept</span></div>
+    <div class="blk"><div class="lab">Message</div><div class="txt">Thanks for connecting, Susan.
+
+The Murals &amp; Graphics direction is what caught my attention. Supplying Marriott, Hilton and IHG to spec is one business. Art-led work is a different one — it gets bought on how it looks in the room, and that's much harder to show on a sample board.
+
+We built a tool for MEC Artworks that handles exactly that: upload a photo of the space, describe the mural in plain words, see it on the wall. Free, five previews.
+
+For a line that sells on look rather than spec, might be worth two minutes. Want the link?</div></div>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">07</span><h2>Scaling to the other 39</h2></div>
+
+  <div class="msg">
+    <div class="msg-head"><span class="k">Variant A template</span></div>
+    <div class="blk"><div class="lab">Persona bridge</div><div class="txt">{first_name} — my colleague Shahwaz reached out on LinkedIn recently, so I'll keep this short.</div></div>
+    <div class="blk"><div class="lab">1 · Observation</div><div class="txt">{One true, specific thing — quote their CUSTOM_OFFERING or HOOK column, or their contact's job title. Must be checkable on their own site.}</div></div>
+    <div class="blk"><div class="lab">2 · Consequence</div><div class="txt">{One sentence on what that costs them, in their language.}</div></div>
+    <div class="blk"><div class="lab">3 · Proof</div><div class="txt">We built a tool for MEC Artworks where a client describes what they want in plain words, uploads a photo of the space, and sees it on the wall.</div></div>
+    <div class="blk"><div class="lab">4 · CTA</div><div class="txt">{Rotate — never the same closing twice in one batch.}</div></div>
+  </div>
+
+  <h4>CTA rotation pool</h4>
+  <ul class="clean">
+    <li><code>Want the link?</code> — non-competitors only</li>
+    <li><code>Open to seeing it?</code></li>
+    <li><code>Happy to walk you through it — worth a look?</code> — competitor segment</li>
+    <li><code>Might be two minutes well spent.</code></li>
+  </ul>
+
+  <h4>Column → copy mapping</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Copy slot</th><th>Source column</th></tr></thead>
+    <tbody>
+      <tr><td>Observation</td><td><code>Use AI Custom Offering</code> or <code>Use AI Hook</code></td></tr>
+      <tr><td>Greeting</td><td><code>Combined First Names</code></td></tr>
+      <tr><td>CTA choice</td><td><code>niche</code> — mosaic/tile → walkthrough, murals → link</td></tr>
+      <tr><td><strong>Never cite</strong></td><td><code>Use AI Visual Tool</code> on rows 4, 12, 27, 42 — unverified</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Instantly headers — collision-proof only</h4>
+  <p><code>msg_subject_line</code> · <code>msg_first_touch</code> · <code>msg_linkedin_dm</code> · <code>dm_first_name</code> · <code>company_name</code> · <code>segment</code></p>
+  <p>Never name a variable <code>email_subject</code> or <code>email_body</code> — they collide with Instantly system fields and cost us a campaign rebuild once already.</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">08</span><h2>Reading the results</h2></div>
+
+  <div class="note warn">
+    <span class="tag">Don't run this as an A/B</span>
+    <p>42 rows split two ways is 21 per arm. At a realistic 5–10% reply rate each arm returns one or two replies. <strong>Two replies against one is not a result — it's noise.</strong> No split of a list this size can tell you which framework is better.</p>
+    <p>This is the same trap as Campaign 2's open rates: a number that looks like evidence and isn't.</p>
+  </div>
+
+  <h4>Do this instead</h4>
+  <ol class="steps">
+    <li><strong>Run Variant A across all 42.</strong> It's the standing rule and the unproven Campaign 2 fix — the thing you actually need an answer about.</li>
+    <li><strong>Read replies qualitatively.</strong> At this volume <em>what people say</em> carries far more than the rate. “Wrong person”, “not interested” and “we already have one” are three different findings.</li>
+    <li><strong>Hold Variant B in reserve.</strong> If A returns near-zero after roughly 20 sends, switch rather than split. A sequential switch beats an underpowered split.</li>
+    <li><strong>If you must split, split the CTA</strong> — walkthrough versus raw link. That changes behaviour far more than sentence structure does, and it doubles as the competitor test.</li>
+  </ol>
+
+  <h4>Measure</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Metric</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>Reply rate</td><td>Primary</td></tr>
+      <tr><td>Positive-reply rate</td><td>The real one</td></tr>
+      <tr><td>Previews generated</td><td>Ask MEC — anyone who uploads a room has self-qualified hard</td></tr>
+      <tr><td style="text-decoration:line-through;color:var(--ink-3)">Open rate</td><td>Ignore. Machine opens make it noise</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section>
+  <div class="sec-head"><span class="sec-num">09</span><h2>Before anything sends</h2></div>
+  <ul class="clean">
+    <li><strong>Reconcile §7 of the master doc</strong> against the live app — canvas renderer or generative AI?</li>
+    <li><strong>Abdullah:</strong> are we comfortable pointing MEC's direct competitors at MEC's own lead-capture tool?</li>
+    <li><strong>Abdullah:</strong> tool access or custom build, and at what price. Touches 1–2 are safe without it; <em>reply handling is not</em>.</li>
+    <li><strong>Sending domain + 3-week warm-up</strong> — still not started, still the only uncompressible item on the critical path.</li>
+    <li>Eyeball the tool question on rows 4, 12, 27 and 42 before their copy goes out.</li>
+    <li>LinkedIn first, email second. 12–15 invites/day, weekdays. Never follow up inside 48 hours.</li>
+  </ul>
+</section>
+
+<footer>
+  Copy written 25 Aug 2026 against MEC's published product pages. The Triminage portfolio page was unreachable from the drafting environment — figures attributed to §0 are carried from the master doc, not re-verified.
+</footer>
+
+</div>
