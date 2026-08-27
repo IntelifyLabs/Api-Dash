@@ -56,12 +56,31 @@ def status_for(r):
         return 'HOLD - RECHECK', r['_note']
     return 'SEND', 'Cleared: audit KEEP/FLAG, revenue gate passed, email domain matches'
 
-NEWCOLS = ['send_status', 'send_note',
+def contact_status(r):
+    """Answers the 'no people found' confusion directly, in the file.
+
+    Clay runs two people searches as a waterfall. 'Find people at company' fails
+    on 33 rows, but 'Find people at company (SMB)' rescues 28 of them. Only rows
+    where BOTH fail have nobody. Reading the first column alone overstates the
+    gap by more than five times.
+    """
+    email = (r.get('Work Email') or '').strip()
+    name  = ((r.get('Combined First Names') or '') + (r.get('Combined Full Name') or '')).strip()
+    main  = (r.get('Find people at company') or '').strip()
+    smb   = (r.get('Find people at company (SMB)') or '').strip()
+    if email: return 'HAS EMAIL', ('found on main search' if main.startswith(chr(9989)) else 'found on SMB fallback')
+    if name:  return 'NAME, NO EMAIL', 'contact identified. Run the email waterfall (S7.7 step 7) on this row'
+    if main.startswith(chr(10060)) and smb.startswith(chr(10060)):
+        return 'NO CONTACT', 'both people searches failed. Needs manual sourcing or LinkedIn'
+    return 'NO CONTACT', 'no contact data on this row'
+
+NEWCOLS = ['contact_status', 'contact_note', 'send_status', 'send_note',
            'email_1_subject', 'email_1_body',
            'email_2_subject', 'email_2_body',
            'email_3_subject', 'email_3_body']
 
 for r in rows:
+    r['contact_status'], r['contact_note'] = contact_status(r)
     st, note = status_for(r)
     r['send_status'], r['send_note'] = st, note
     c = COPY.get((r.get('Work Email') or '').strip().lower()) or COPY.get((r.get('Work Email') or '').strip())
@@ -76,6 +95,10 @@ wb = Workbook()
 # ── narrow, human-readable column set for the working sheets ──
 KEY = ['company', 'Work Email', 'Combined Full Name', 'Title People', 'niche',
        'Annual Revenue', 'Country', 'Website']
+GAP = ['company', 'website', 'niche', 'Annual Revenue', 'Country',
+       'Combined Full Name', 'Title People', 'Linkedin Url People',
+       'Find people at company', 'Find people at company (SMB)',
+       'contact_status', 'contact_note']
 
 def write_sheet(ws, data, cols, widths, wrap_cols=()):
     ws.append(cols)
@@ -104,7 +127,9 @@ def write_sheet(ws, data, cols, widths, wrap_cols=()):
     ws.freeze_panes = 'B2'
     ws.auto_filter.ref = ws.dimensions
 
-W = {'company': 26, 'Work Email': 30, 'Combined Full Name': 20, 'Title People': 24,
+W = {'contact_status': 16, 'contact_note': 46, 'Linkedin Url People': 34,
+     'Find people at company': 20, 'Find people at company (SMB)': 24, 'website': 26,
+     'company': 26, 'Work Email': 30, 'Combined Full Name': 20, 'Title People': 24,
      'niche': 20, 'Annual Revenue': 13, 'Country': 8, 'Website': 26,
      'send_status': 15, 'send_note': 44,
      'email_1_subject': 30, 'email_2_subject': 30, 'email_3_subject': 30,
@@ -126,9 +151,17 @@ rest.sort(key=lambda r: (r['send_status'], r['company']))
 ws3 = wb.create_sheet('Held & Excluded')
 write_sheet(ws3, rest, KEY + ['send_status', 'send_note'], W, wrap_cols=('send_note',))
 
+# Sheet 4 - the contact gap, which is what the two people-search columns actually mean
+gaps = [r for r in rows if r['contact_status'] != 'HAS EMAIL']
+gaps.sort(key=lambda r: (r['contact_status'], r['company']))
+ws4 = wb.create_sheet('Contact Gaps')
+write_sheet(ws4, gaps, GAP, W, wrap_cols=('contact_note',))
+
 wb.save(OUT)
 
 from collections import Counter
+cc = Counter(r['contact_status'] for r in rows)
+print('  contact:', dict(cc))
 c = Counter(r['send_status'] for r in rows)
 print(f'{OUT}\n  sheets: Outreach ({len(rows)}) · Send List ({len(send)}) · Held & Excluded ({len(rest)})')
 print(f'  columns: {len(src_cols)} original + {len(NEWCOLS)} new = {len(src_cols)+len(NEWCOLS)}')

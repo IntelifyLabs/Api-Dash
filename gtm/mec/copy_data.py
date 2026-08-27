@@ -42,7 +42,7 @@ Here is the part that matters for you. Someone types "brushed sage, large botani
 
 One thing you can check today without me: pull your search log for the last month and count the queries that returned nothing. That number is the size of this gap, and it costs you nothing to find out.
 
-The tool is at ai.mecartworks.com. ai.mecartworks.com, five previews free, email verification only.
+The tool is at ai.mecartworks.com. Five previews free, email verification only.
 """,
  "how do you convert the no image visitor?", """
 Stacy,
@@ -1257,7 +1257,7 @@ One thing I would guess at. How often does a custom project come back smaller th
 
 Not lost, just trimmed. A feature wall becomes an accent panel. That trim is almost always uncertainty rather than budget, and it is worth counting, because it never shows up as a lost sale in any report.
 
-ai.mecartworks.com. ai.mecartworks.com. Five previews, free, nothing to subscribe to. Upload a room, describe the piece, see it in place.
+ai.mecartworks.com. Five previews, free, nothing to subscribe to. Upload a room, describe the piece, see it in place.
 """,
  "how do your designers show it now?", """
 Heather,
