@@ -43,7 +43,8 @@ def status_for(r):
     if not email:
         return 'NO EMAIL', 'No work email on this row — LinkedIn or enrichment needed'
     if r['_verdict'] == 'DROP':
-        return 'EXCLUDED', f"Audit verdict DROP — {r['_note']}"
+        return 'HOLD - OFF ICP', (f"Copy written on request, but this row failed a S7.4 gate: {r['_note']}. "
+                                  "Decide deliberately before sending.")
     dom = (r.get('Domain') or '').lower().replace('www.', '')
     edom = email.split('@')[-1].lower()
     if dom and edom and edom != dom and edom.split('.')[0] != dom.split('.')[0]:

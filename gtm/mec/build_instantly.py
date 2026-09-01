@@ -31,6 +31,7 @@ HEADERS = [
     'msg_subject_three', 'msg_touch_three',
     'dm_job_title', 'msg_segment', 'msg_cta_type',
 ]
+HEADERS_ALL = HEADERS + ['send_gate', 'gate_reason']
 
 rows = list(csv.DictReader(open(SRC, encoding='utf-8')))
 aud = list(csv.DictReader(open(AUD, encoding='utf-8')))
@@ -43,7 +44,7 @@ def revenue_fails(v):
 def gate(r):
     email = (r.get('Work Email') or '').strip()
     if not email: return 'NO EMAIL'
-    if r['_verdict'] == 'DROP': return 'EXCLUDED'
+    if r['_verdict'] == 'DROP': return 'HOLD'
     dom = (r.get('Domain') or '').lower().replace('www.', '')
     ed = email.split('@')[-1].lower()
     if dom and ed != dom and ed.split('.')[0] != dom.split('.')[0]: return 'EXCLUDED'
@@ -73,23 +74,37 @@ def build(r):
         'msg_cta_type': cta,
     }
 
-send, hold = [], []
+def reason(r, g):
+    if g == 'SEND': return 'cleared: audit passed, revenue gate passed, email domain matches'
+    if revenue_fails(r['Annual Revenue']):
+        return f"revenue {r['Annual Revenue']} is under the $1M gate (S7.4). Verify before sending"
+    if r['_verdict'] == 'PARKED':
+        return 'parked niche. Abdullah has not confirmed the engine renders rugs or stained glass'
+    if r['_verdict'] == 'DROP':
+        return 'outside the S7.4 ICP. Copy written on request. Decide deliberately before sending'
+    if r['_verdict'] == 'RECHECK': return 'site was mid rebuild at audit. Re-check before sending'
+    return 'held'
+
+send, hold, allrows = [], [], []
 for r in rows:
     email = (r.get('Work Email') or '').strip().lower()
     if email not in COPY:
         continue
     g = gate(r)
-    if g == 'SEND':   send.append(build(r))
-    elif g == 'HOLD': hold.append(build(r))
+    d = build(r)
+    if g == 'SEND':   send.append(d)
+    elif g == 'HOLD': hold.append(d)
+    allrows.append({**d, 'send_gate': g, 'gate_reason': reason(r, g)})
 
-def write(path, data):
+def write(path, data, headers=HEADERS):
     with open(path, 'w', newline='', encoding='utf-8-sig') as f:
-        w = csv.DictWriter(f, fieldnames=HEADERS, quoting=csv.QUOTE_ALL)
+        w = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         w.writeheader(); w.writerows(data)
     print(f'{path}: {len(data)} rows')
 
 write('MEC_Instantly_Upload.csv', send)
 write('MEC_Instantly_Hold.csv', hold)
+write('MEC_Instantly_All46.csv', allrows, HEADERS_ALL)
 
 print(f'\nheaders ({len(HEADERS)}): ' + ', '.join(HEADERS))
 print('\nCTA split in the send file:')
