@@ -1,7 +1,7 @@
 # TRIMINAGE — GTM MASTER STATUS
 
 **Owner:** Shahwaz Hassan, GTM Engineer
-**Last updated:** 24 August 2026
+**Last updated:** 14 September 2026
 **Purpose:** single source of truth for every campaign — what was decided, what was tested, what was learned, and exactly where each workstream stopped.
 
 ---
@@ -514,6 +514,35 @@ Merged Abdullah's seed table with the Clay filter search results in one Clay tab
 
 **Parked niches (rugs, stained glass):** 7 strong candidates identified and tagged PARKED, ready to activate once Abdullah confirms rendering fit.
 
+### TCNA domain research — COMPLETE (14 Sept 2026, no Clay used)
+
+TCNA's member locator exports no website column, so all 25 sourced rows arrived domain-less and **blocked company enrichment entirely** — every downstream Clay step needs a domain. Resolved by hand via web search over each company's own indexed pages. **No Clay call was made.**
+
+**Result: 24 of 25 domains found.** Record: `wave2/tcna_domains.csv` (domain, alt domain, city, state, confidence, gate verdict, reasoning per row). Clay-shaped upload: `wave2/MEC_Wave2_TCNA_Clay.csv`.
+
+| Confidence | Rows | Meaning |
+|---|---|---|
+| high | 22 | company's own site confirmed in results, city/state cross-checked against the TCNA listing |
+| medium | 1 | Tile by Design → `tilebydesign.net`, from the TCNA listing only, no independent hit. **Verify it resolves before spending credits** |
+| none | 1 | **Hovey Tile Art has no website.** Directory-only across two search passes (LinkedIn, Yelp, Manta, Yellow Pages). Mentone CA, owner Cindy Hobey, est. 1984, ~21 staff. Cannot be enriched or emailed. Phone 909-794-3815 if worth a manual call |
+
+**Free gate verdicts fell out of the research at zero credit cost — 10 of 25 rows need no site visit to decide:**
+
+| Verdict | Rows | Companies |
+|---|---|---|
+| **EXCLUDE** | 1 | **The Tileworks of Bucks County** — a 501c3 non-profit museum running the historic Moravian Pottery and Tile Works, with tours and classes. Hits two §7.4 exclusions at once: nonprofit/institutional buyer *and* teaching studio |
+| **LIKELY OUT (gate 3)** | 4 | **Casa Ceramica** (retail division of LTS Ceramics, sources from artisans across six countries) · **Chadwick's Surfaces** ("from around the world" is the distributor tell) · **Elon Tile & Stone** (self-described importing/exporting wholesaler, and stone not pattern — two gates against it) · **Wakei & Company** (US stocking arm, see below) |
+| **FLAG** | 4 | **ALVA Surfaces** (distributor *and* real manufacturer of its own Wizard/Bison Brick/Valletta lines — not a pure middleman) · **Rookwood Pottery** (sells 3D art pottery *and* architectural tile; pitch the tile division only) · **Whitehill Enterprises** (design-led but runs installation too) · **Winsor Fireform** (genuine maker of custom photographic porcelain enamel, but sells to architects and public-art commissions — **no customer-facing design step**, so internal-efficiency pitch only) |
+| **PASS** | 15 | remainder, run gates 3–5 on the site |
+
+**Priority candidates from this source:** Quemere Designs (400+ shapes × 500+ glazes, every order custom-glazed, no configurator found — the biggest combinatorial catalogue on the list) · Mediterra Tile (custom glaze palette on a 4–8 week lead time, which *is* the approval wait) · Dunis Studios · Linden Workshops (bought and renamed 2024, new owner) · LIVDEN.
+
+### Resolving domains caught a duplicate that name matching could not
+
+**Wakei & Company (Simi Valley CA) and the Cersaie exhibitor "X-IS" (Tajimi, Gifu, Japan) share `wa-kei.com`.** Nothing in either name hints at the other; only the domain exposed it. Wakei is the US stocking arm the Japanese makers set up — so the design decision sits in Japan, and **X-IS is the real prospect, Wakei is not.** The merge keeps X-IS and carries Wakei's research forward in `pre_flag_reason` rather than discarding it.
+
+**Generalises to a rule:** resolve domains *before* deduping, not after. Wave 2 raw is 740 rows across five directories with heavy overlap; name-key dedupe caught 49 and the domain caught a 50th that reversed which entity to contact. The 105 rows still on `NEEDS DOMAIN` are therefore also un-deduped.
+
 ### Claygent site audit — COMPLETE (25 Aug 2026)
 
 All **60 blank rows** of `MEC_Warm_Shortlist_Seed-Default-view-export-1787598276390.csv` are audited across four batches. **Zero blocked rows remain.** Consolidated output: `MEC_Warm_Shortlist_AUDITED.csv` — every row carries verdict, visual-tool level, send priority and reason.
@@ -770,7 +799,10 @@ Not a demo request. Not a call booking. The tool is live and clickable — that'
 | 3c | Decide the **catalog-only boundary rule** once, for rows 27 + 51, and apply it to every future catalog row | Shahwaz's call |
 | 4 | Load 43 seed survivors tagged `source = seed` | Nothing |
 | 5 | Cersaie xlsx export + Tile of Spain download | Nothing — **easiest win available** |
-| 6 | TCNA manual copy (~200 rows, revenue pre-qualified) | Nothing |
+| 6 | ~~TCNA manual copy~~ ✅ **DONE** — 25 rows sourced, **24 domains researched by hand 14 Sept** (`wave2/tcna_domains.csv`). Ready for Clay company enrichment | — |
+| 6a | Verify `tilebydesign.net` resolves; decide whether Hovey Tile Art is worth a phone call with no website | Nothing |
+| 6b | Dedupe check: **Unique Design Solutions** ships a "Uniquely Oceanside" board, and **Oceanside Glasstile is already row 14 of wave 1** — confirm they are separate accounts before outreach | Nothing |
+| 6c | Same-city check: Images In Tile and Whitehill Enterprises are both in Joplin MO (pop. ~52k). Confirm they are unrelated entities | Nothing |
 | 7 | Google Maps city sweeps via Clay, limit 50 | #2 |
 | 8 | Run gates 1–6 on all new rows | #5, #6, #7 |
 | 9 | Run enrichment on survivors | #8 |

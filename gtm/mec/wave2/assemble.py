@@ -45,10 +45,22 @@ for r in list(wb['export'].iter_rows(values_only=True))[1:]:
     })
 
 # ---- TCNA: US tile manufacturers, $3M+ membership --------------------------
+# TCNA's locator exports no website column, so every row arrived domain-less and
+# blocked company enrichment. Domains were researched by hand (web search over
+# each company's own pages, never Clay) and live in tcna_domains.csv with a
+# confidence marker and a gate verdict per row. One row, Hovey Tile Art, has no
+# website at all: it is directory-only, so it stays NEEDS DOMAIN on purpose.
+TCNA_RESEARCH = {r['company']: r for r in
+                 csv.DictReader(open('tcna_domains.csv', encoding='utf-8'))}
 for n in [l.strip() for l in open('tcna_raw.txt', encoding='utf-8') if l.strip()]:
-    rows.append({'company': n, 'website': '', 'domain': '', 'generic_email': '',
-                 'country': 'US', 'town': '', 'stand': '',
-                 'niche': 'Decorative / Artisan Tile', 'source': 'TCNA'})
+    t = TCNA_RESEARCH[n]                       # KeyError here means the two files drifted
+    rows.append({'company': n,
+                 'website': f"https://{t['domain']}" if t['domain'] else '',
+                 'domain': t['domain'], 'generic_email': '',
+                 'country': 'US', 'town': t['city'], 'stand': '',
+                 'niche': 'Decorative / Artisan Tile', 'source': 'TCNA',
+                 'domain_confidence': t['confidence'],
+                 'research_flag': t['gate_flag'], 'research_note': t['research_note']})
 
 # ---- Coverings -------------------------------------------------------------
 for n in [l.strip() for l in open('coverings_raw.txt', encoding='utf-8') if l.strip()]:
@@ -81,7 +93,15 @@ OUT_WORDS = re.compile(
     r'parquet|legno|laminat|vinyl|lvt|spc|wpc|carpet|rug|flooring|underlay|'
     r'sanitar|rubinett|bagno|shower|doccia|import|export|wholesale|distribut)\b', re.I)
 
+# a hand-researched verdict outranks the keyword heuristics below
+RESEARCH_MAP = {'EXCLUDE': 'EXCLUDE', 'LIKELY': 'LIKELY OUT',
+                'BLOCKED': 'NEEDS DOMAIN', 'FLAG': 'NEEDS EYES', 'PASS': 'NEEDS EYES'}
+
 def pre_flag(r):
+    rf = r.get('research_flag')
+    if rf:
+        return (RESEARCH_MAP[rf.split()[0].rstrip(',')],
+                f"{rf}. {r['research_note']}")
     key = norm_name(r['company'])
     if key in PATTERN_SELLER:
         return ('EXCLUDE', 'Heimtextil hall 4.2 textile design studio. Sells original patterns to '
@@ -110,6 +130,12 @@ for r in rows:
             prev['source'] = prev['source'] + ' + ' + r['source']
         for f in ('website','domain','generic_email','country','town','stand'):
             if not prev[f] and r[f]: prev[f] = r[f]
+        # Wakei & Company matched the Cersaie exhibitor X-IS on wa-kei.com, which is
+        # the whole point of resolving domains: name matching would never have caught
+        # it. The surviving row keeps its own verdict, but the research behind the
+        # duplicate is the reason the merge happened, so it must not vanish.
+        if r.get('research_note') and not prev.get('research_note'):
+            prev['merge_note'] = f"{r['company']}: {r['research_note']}"
         continue
     seen[key] = r
     merged.append(r)
@@ -119,13 +145,17 @@ for r in merged:
 
 for r in merged:
     r['pre_flag'], r['pre_flag_reason'] = pre_flag(r)
+    if r.get('merge_note'):
+        r['pre_flag_reason'] += ' || merged duplicate, researched separately as ' + r['merge_note']
     r['row_type'] = 'new'          # S7.7: gate firmographic enrichment on this
     r['wave'] = 'wave2'
+    # directory rows are trusted as given; only hand-researched rows carry a marker
+    r.setdefault('domain_confidence', 'directory' if r['domain'] else '')
 
-COLS = ['company','website','domain','country','town','niche','source','stand',
-        'generic_email','also_trading_as','pre_flag','pre_flag_reason','row_type','wave']
+COLS = ['company','website','domain','domain_confidence','country','town','niche','source',
+        'stand','generic_email','also_trading_as','pre_flag','pre_flag_reason','row_type','wave']
 with open(OUT, 'w', newline='', encoding='utf-8-sig') as f:
-    w = csv.DictWriter(f, fieldnames=COLS, quoting=csv.QUOTE_ALL)
+    w = csv.DictWriter(f, fieldnames=COLS, quoting=csv.QUOTE_ALL, extrasaction='ignore')
     w.writeheader(); w.writerows(merged)
 
 from collections import Counter
@@ -135,3 +165,7 @@ for k, v in Counter(r['source'] for r in merged).most_common(): print(f'  {v:>4}
 print('\nby pre_flag:')
 for k, v in Counter(r['pre_flag'] for r in merged).most_common(): print(f'  {v:>4}  {k}')
 print(f"\nrows with a website: {sum(1 for r in merged if r['domain'])}/{len(merged)}")
+tcna = [r for r in merged if 'TCNA' in r['source']]
+print(f"TCNA rows: {len(tcna)}, with a domain {sum(1 for r in tcna if r['domain'])}")
+for k, v in Counter(r['domain_confidence'] for r in tcna).most_common():
+    print(f"  {v:>4}  domain confidence: {k}")
