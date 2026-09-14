@@ -514,34 +514,78 @@ Merged Abdullah's seed table with the Clay filter search results in one Clay tab
 
 **Parked niches (rugs, stained glass):** 7 strong candidates identified and tagged PARKED, ready to activate once Abdullah confirms rendering fit.
 
-### TCNA domain research — COMPLETE (14 Sept 2026, no Clay used)
+### Wave-2 domain research — COMPLETE, all four directories (14 Sept 2026, no Clay used)
 
-TCNA's member locator exports no website column, so all 25 sourced rows arrived domain-less and **blocked company enrichment entirely** — every downstream Clay step needs a domain. Resolved by hand via web search over each company's own indexed pages. **No Clay call was made.**
+Only Cersaie exports a website column. **TCNA, Coverings, Heimtextil and TISE all export names alone**, so 143 of the 740 raw rows arrived domain-less and **blocked company enrichment outright** — every downstream Clay step needs a domain. All 143 were resolved by hand, by web search over each company's own indexed pages. **No Clay call was made for any of it.**
 
-**Result: 24 of 25 domains found.** Record: `wave2/tcna_domains.csv` (domain, alt domain, city, state, confidence, gate verdict, reasoning per row). Clay-shaped upload: `wave2/MEC_Wave2_TCNA_Clay.csv`.
+**Result: 109 domains found, and 24 rows proven unreachable rather than left blank.**
 
-| Confidence | Rows | Meaning |
+| Source | Rows | Domain found | Verdict from the research alone |
+|---|---|---|---|
+| TCNA | 25 | 24 | 15 pass · 4 flag · 3 likely out · 1 exclude · 1 no site |
+| Coverings | 80 | 65 | 6 pass · 10 flag · 55 likely out |
+| Heimtextil | 23 | 18 | 9 pass · 4 likely out · 10 exclude |
+| TISE | 15 | 12 | 1 flag · 10 likely out · 4 exclude |
+
+Records: `wave2/{tcna,coverings,heimtextil,tise}_domains.csv` — domain, alt domain, city, country, confidence, gate verdict and reasoning per row. Deliverables: `wave2/MEC_Wave2_Clay_Upload.csv` (all 681 after dedupe), `MEC_Wave2_Domains_Patch.csv` (the 133 researched rows, to fill the blank domain column in Clay), `MEC_Wave2_Researched_Shortlist.csv` (**the 44 that survived the free gates** — this is the only cut worth spending credits on).
+
+**Confidence is recorded per row and is not uniform. Four values:**
+
+| Value | Rows | Meaning |
 |---|---|---|
-| high | 22 | company's own site confirmed in results, city/state cross-checked against the TCNA listing |
-| medium | 1 | Tile by Design → `tilebydesign.net`, from the TCNA listing only, no independent hit. **Verify it resolves before spending credits** |
-| none | 1 | **Hovey Tile Art has no website.** Directory-only across two search passes (LinkedIn, Yelp, Manta, Yellow Pages). Mentone CA, owner Cindy Hobey, est. 1984, ~21 staff. Cannot be enriched or emailed. Phone 909-794-3815 if worth a manual call |
+| high | 100 | the company's own site appeared in results *and* city, country or business description cross-checks against the directory row |
+| medium | 9 | a domain is named, but only by a directory or a summary, with no independent hit on the site itself. **Verify it resolves before spending credits** |
+| none | 9 | searched twice, **no website exists.** Directory or marketplace presence only |
+| unresolved | 15 | name too generic or too thinly indexed to pin down. Needs the exhibitor listing itself |
 
-**Free gate verdicts fell out of the research at zero credit cost — 10 of 25 rows need no site visit to decide:**
+**Three rows where the wrong domain is worse than no domain** — each is a live name collision, already the campaign's most repeated failure (Mosaic Studio, Contrado, Ian Leino):
+- **Intrend Tile** (Brea CA) — do **not** use `intrend.co.in`, an unrelated Indian wall-tile company
+- **Honor View Enterprise** (Taiwan) — do **not** use `honortile.com`, that is Zibo Honor Ceramic
+- **Echelon Surfaces** — do **not** use `echelontileandstone.com`, a different Tri-State fabricator
+- also: **E-CERAMIC** ≠ `ecoceramica.com` · **A.G.M. S.r.l.** ≠ `agmtex.it` · **Trend Surplus** ≠ `trend-group.com` · **Marmotech** has four unrelated claimants (DO, TR, SA, EG)
 
-| Verdict | Rows | Companies |
-|---|---|---|
-| **EXCLUDE** | 1 | **The Tileworks of Bucks County** — a 501c3 non-profit museum running the historic Moravian Pottery and Tile Works, with tours and classes. Hits two §7.4 exclusions at once: nonprofit/institutional buyer *and* teaching studio |
-| **LIKELY OUT (gate 3)** | 4 | **Casa Ceramica** (retail division of LTS Ceramics, sources from artisans across six countries) · **Chadwick's Surfaces** ("from around the world" is the distributor tell) · **Elon Tile & Stone** (self-described importing/exporting wholesaler, and stone not pattern — two gates against it) · **Wakei & Company** (US stocking arm, see below) |
-| **FLAG** | 4 | **ALVA Surfaces** (distributor *and* real manufacturer of its own Wizard/Bison Brick/Valletta lines — not a pure middleman) · **Rookwood Pottery** (sells 3D art pottery *and* architectural tile; pitch the tile division only) · **Whitehill Enterprises** (design-led but runs installation too) · **Winsor Fireform** (genuine maker of custom photographic porcelain enamel, but sells to architects and public-art commissions — **no customer-facing design step**, so internal-efficiency pitch only) |
-| **PASS** | 15 | remainder, run gates 3–5 on the site |
+**Confirmed no-website rows** (not failed searches — these companies have none): Hovey Tile Art · LAXVEER CERAMIC (its own registration record lists the website as "Not Available") · Intrend Tile · Seed Decorative Material · Xiamen Stonelink · Arts Co. · AV-Design · KRITI & KUNAL · Sandra Jacobs Design.
 
-**Priority candidates from this source:** Quemere Designs (400+ shapes × 500+ glazes, every order custom-glazed, no configurator found — the biggest combinatorial catalogue on the list) · Mediterra Tile (custom glaze palette on a 4–8 week lead time, which *is* the approval wait) · Dunis Studios · Linden Workshops (bought and renamed 2024, new owner) · LIVDEN.
+### The two rows worth arguing about
 
-### Resolving domains caught a duplicate that name matching could not
+**Intrend Tile** is the most frustrating row in wave 2: a Southern California mosaic company started by two friends from art school to make their own designer tiles, with a Brea showroom — a textbook ICP profile — that has no website and sells only through Amazon, Wayfair, Perigold and Faire. Unreachable by the workflow as built. Worth a manual look or a phone call.
 
-**Wakei & Company (Simi Valley CA) and the Cersaie exhibitor "X-IS" (Tajimi, Gifu, Japan) share `wa-kei.com`.** Nothing in either name hints at the other; only the domain exposed it. Wakei is the US stocking arm the Japanese makers set up — so the design decision sits in Japan, and **X-IS is the real prospect, Wakei is not.** The merge keeps X-IS and carries Wakei's research forward in `pre_flag_reason` rather than discarding it.
+**StyleAccess** (Carrollton TX) is the clean test of the 24 Aug §7.4 pivot. It designs but does not manufacture: owns Lungarno Ceramics and CommodiTile, says it is involved in all phases of the tile design process, and sources production from Asia and Europe. Before the pivot dropped "makes the product themselves" as a hard gate, this row was a drop. After it, it qualifies on criteria 1 and 3. **If the pivot was right, StyleAccess should reply.** `WILLIAM F. KEMPF & SON` is the other boundary case — custom entrance mats are genuinely flat, custom and client-approved, but in coco and rubber, so it is a criterion-2 rendering question of the same class as the parked niches.
 
-**Generalises to a rule:** resolve domains *before* deduping, not after. Wave 2 raw is 740 rows across five directories with heavy overlap; name-key dedupe caught 49 and the domain caught a 50th that reversed which entity to contact. The 105 rows still on `NEEDS DOMAIN` are therefore also un-deduped.
+### Priority candidates from the research — 16 rows, ranked
+
+**TCNA:** Quemere Designs (400+ shapes × 500+ glazes, every order custom-glazed to one dye lot, no configurator found — the biggest combinatorial catalogue on the list) · Mediterra Tile (custom glaze palette on a 4–8 week lead time, which *is* the approval wait) · Dunis Studios · Linden Workshops (bought and renamed 2024, so a new owner) · LIVDEN.
+
+**Coverings:** **Bar-On Studio** (Petah Tikva, founded 2010 by three brothers, family-owned, designs *and* manufactures sculptural concrete wall coverings in its own factory, sells through Ann Sacks since 2017 — the strongest single row in wave 2) · Driftwood Design Labs · Jeffrey Court (started 1991 as a hand-painted tile business, still founder-named) · Maruman Shokai (Tajimi, since 1931, 65+ years of porcelain mosaic, named Majolica and Deco lines) · Yukari Ceramics · Zaijian Mosaic · Jerusalem Heights.
+
+**Heimtextil:** **The Wallfashion House / Grandeco** (1,000+ new designs a year, 20M rolls, €150M, 600 people — the largest design throughput on the entire list) · Marburger Tapetenfabrik (1845, 290 people, named international designers) · A.S. Création (2,000 new designs a year, and **already runs a room visualiser**, so it joins the §11 has-a-configurator A/B cohort) · Parato/Cristiana Masi (architect-owner is the buyer) · Esselle Retail (300+ live wallpapers coordinated across four product categories) · Ohpopsi.
+
+### Resolving domains caught 10 duplicates that name matching could not
+
+Wave-2 raw went 740 → 691 on name-key dedupe. Adding the researched domains took it to **681**: ten more duplicates surfaced, and one of them reversed which entity to contact.
+
+**The mechanism, worth understanding because it will recur:** the dedupe key is the domain when a row has one and the normalised name otherwise. Cersaie rows had domains; the other four directories did not. So the two groups were compared in *different key spaces* and could never collide, no matter how similar the names. `ARVEX` and `Arvex Srl.` both normalise to `arvex` and still did not merge.
+
+**The one that mattered:** **Wakei & Company (Simi Valley CA) and the Cersaie exhibitor "X-IS" (Tajimi, Gifu, Japan) share `wa-kei.com`.** Nothing in either name hints at the other. Wakei is the US stocking arm several Japanese makers set up, so the design decision sits in Japan and **X-IS is the real prospect, Wakei is not.** The merge keeps X-IS and carries Wakei's research into `pre_flag_reason` rather than discarding it. The other nine were Anatolia, Arvex, Cinca, NG Kutahya, Pavigres, Termal, Travertini Paradiso, Turkishceramics and Yukari.
+
+> **Standing-rule candidate: resolve domains before deduping, never after.** Name normalisation cannot see across sources that disagree about whether a website column exists.
+
+### Coverings was the wrong filter, and the directory says so
+
+**55 of 80 Coverings rows are LIKELY OUT and only 6 pass** — a ~7% survival rate against the ~45% the §7.5 estimate assumed for exhibitor lists, and far below TCNA's 60%. The filters returned volume porcelain factories (Morbi, Foshan, Turkey, Iznik-scale plants running 10–41 million m² a year) and importer-distributors, because those are the companies that buy the big booths.
+
+**Coverings runs a dedicated "Art Tile Village" pavilion** (coverings.com/art-tile-village/) for exactly the artisan makers the ICP is written around, and the applied filters missed it entirely. **Re-source Coverings from that pavilion rather than from product categories.** The same logic applies to `turkishceramics.com`: it is not a prospect (a state-backed export promotion body, nobody to sell to) but its member directory is a free, pre-filtered list of 30+ Turkish tile makers.
+
+**TISE is confirmed dead: 0 of 15 pass.** It returned quarries, diamond blades, polystyrene moulding, a patent-licensing company and a coco-mat maker. Do not source from TISE again — the earlier "near-zero" read was right.
+
+### Data-quality corrections made during this research
+
+| What | Detail |
+|---|---|
+| **The two-letter code trap, caught before it shipped** | The research files first stored US state codes and ISO country codes in one `state` column. That is the **exact ambiguity behind the Bisazza VI bug**, which this doc has now flagged four times: `ID` is Idaho *and* Indonesia, `IL` Illinois *and* Israel, `IN` Indiana *and* India, `CA` California *and* Canada. Jeffrey Court and Driftwood (both California) were resolving to Canada. Fixed by giving `country` its own column, populated from a named subdivision map, never inferred from the code |
+| Full TCNA name resolved | The truncated `Images In Tile USA, Inc. dba Bison Coating &amp...` is **Images In Tile USA, Inc. dba Bison Coating & Supply** — two businesses, two domains. Use `imagesintile.com` (custom tile murals); `bisoncoating.com` is the dye-sublimation blanks supply arm and off-ICP |
+| Country corrections from the research | **Yukari Ceramics** reads Turkish from its Coverings neighbours and is Japanese/Italian · **Rafias Prisim Textil** carries an Italian `S.r.l.` and is Argentine (Valentin Alsina, Buenos Aires) |
+| A prior exclusion re-reasoned | **Claire Louise Designs** was excluded as a hall-4.2 studio selling patterns to manufacturers. She in fact designs *and* prints onto her own cushions and kitchenware for John Lewis and Fenwick, so she is on the **right** side of the trade and fails on revenue instead. Same verdict, wrong reason — and the dead hall-4.2 keyword set has been removed from `assemble.py` now that all 23 rows carry a hand verdict |
 
 ### Claygent site audit — COMPLETE (25 Aug 2026)
 
@@ -800,7 +844,11 @@ Not a demo request. Not a call booking. The tool is live and clickable — that'
 | 4 | Load 43 seed survivors tagged `source = seed` | Nothing |
 | 5 | Cersaie xlsx export + Tile of Spain download | Nothing — **easiest win available** |
 | 6 | ~~TCNA manual copy~~ ✅ **DONE** — 25 rows sourced, **24 domains researched by hand 14 Sept** (`wave2/tcna_domains.csv`). Ready for Clay company enrichment | — |
-| 6a | Verify `tilebydesign.net` resolves; decide whether Hovey Tile Art is worth a phone call with no website | Nothing |
+| 6z | ✅ **DONE 14 Sept** — Coverings, Heimtextil and TISE domains researched by hand too. 109 of 143 found, no Clay used. **Enrich from `MEC_Wave2_Researched_Shortlist.csv` (44 rows), not from all 133** | — |
+| 6y | **Re-source Coverings from the Art Tile Village pavilion**, not product-category filters — the current 80 rows survive at ~7%. Also pull the `turkishceramics.com` member directory (30+ makers, free) | Nothing — **best sourcing win left** |
+| 6x | Verify the 9 `medium`-confidence domains resolve before spending credits (incl. `tilebydesign.net`, `ngkutahyaseramik.com.tr`, `avangardeceramiche.com`) | Nothing |
+| 6w | Get the exhibitor listings for the 15 `unresolved` rows, or drop them — every one already fails a gate except ITALMOSAICO, which is worth one more look | Nothing |
+| 6v | Decide **StyleAccess** and **William F. Kempf** — the two rows that test the §7.4 pivot and the criterion-2 rendering question | Shahwaz's call |
 | 6b | Dedupe check: **Unique Design Solutions** ships a "Uniquely Oceanside" board, and **Oceanside Glasstile is already row 14 of wave 1** — confirm they are separate accounts before outreach | Nothing |
 | 6c | Same-city check: Images In Tile and Whitehill Enterprises are both in Joplin MO (pop. ~52k). Confirm they are unrelated entities | Nothing |
 | 7 | Google Maps city sweeps via Clay, limit 50 | #2 |
