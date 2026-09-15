@@ -361,6 +361,37 @@ Opening geography exposed the error. **Wall & Deco, Glamora, Inkiostro Bianco, I
 
 ---
 
+## 7.4a — ICP REVISED AGAIN (15 Sept 2026): medium is no longer a gate
+
+Shahwaz: **3D products qualify too**, because the tool is customised per
+business and branding, so the flat-2D rendering constraint does not gate
+anything. Combined with the 15 Sept call that catalogue-only sellers qualify
+alongside custom, and with the product stated as two options — try-on against
+the company's own catalogue from an uploaded room photo, and a written prompt
+generating a visual from scratch — the ICP is now very wide.
+
+**Measured effect on the 576 enriched rows: 471 qualify (81%).** Only 99 are
+genuinely out — 73 not a product company, 17 under the $1M gate, 8 other, 1
+wrong company — plus 6 quarries to review. 183 previously-cut rows come back.
+
+**Two consequences that matter more than the widening itself:**
+
+1. **The ICP question has stopped discriminating.** At 81% pass it is a
+   formality, not a qualifier. Ranking must now come from `tool_level`,
+   revenue, and size→buyer. The 17 MANUAL rows remain the best prospects on
+   the list; widening the ICP added average rows, not better ones.
+2. **§7.10 Q3 is closed by implication.** Rugs, stained glass and pottery were
+   parked or excluded *only* on the flat-2D constraint. That constraint is
+   gone, so they are in and Abdullah does not need to answer it.
+
+**The sharpest remaining cut is not ICP fit and not tool_level.** Per
+`wave2/q1/competitive_landscape.md`, competitors cover one half each — Roomvo,
+Daltile Stylizer and ~10 free vendors do try-on; Mozaico does
+prompt-to-mosaic. Almost nobody does both, branded, on the client's domain,
+over the client's catalogue. So target **has_tryon = yes AND has_prompt = no**:
+already paid for visualisation (budget and intent proven), missing the half
+that is hard to buy elsewhere.
+
 ## 7.4 — Locked ICP (REVISED 24 Aug 2026 — see pivot note below)
 
 **Companies that sell custom/made-to-order flat 2D pattern products — whether they design the patterns in-house, print/produce from a catalog, or let customers upload/choose — where the tool can slot in as the customer-facing (or internal) design/approval step.**
