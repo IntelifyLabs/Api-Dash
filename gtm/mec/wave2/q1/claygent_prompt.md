@@ -291,3 +291,83 @@ canary for exactly this failure. If Quemere and AB both come back ADVANCED,
 the prompt is fixed. Then spot-check 10 of the NONE rows from the full run
 before trusting that column, because NONE is now the value most likely to be
 wrong.
+
+
+## Re-test after the hardened prompt (16 Sept) — IT DID NOT WORK
+
+Net effect: one URL improved, one row regressed, the target row unchanged, the
+canary never run. The hardened wording made Claygent *more confidently
+dismissive*, not more thorough.
+
+| row | v1 | v2 | verdict |
+|---|---|---|---|
+| AB (Azulejos Benadresa) | NONE | NONE | ✗ still wrong. The tool is at `/en/create3d/` |
+| ABITARE LA CERAMICA | BASIC + url | **NONE**, url dropped | ✗ **REGRESSION** — v1 was right |
+| ABK - MOOOI | ADVANCED, url `/it/configuratore` | ADVANCED, url `abk.it/en` | ~ substance right, URL degraded to a homepage |
+| A.A.T.C. | MANUAL, weak marketing quote | MANUAL, real quote about the technical office | ✓ improved |
+| 41zero42 · 4Puntozero · 7C · ACIMAC · 4Design | correct | correct | ✓ unchanged |
+| **quemeredesigns.com** | — | **not run** | canary untested |
+
+Score: v1 was 8 clean / 1 misfiled / 1 miss. v2 is 7 clean / 2 wrong / 1 unverified.
+
+### Why the fix failed — this is a capability limit, not a wording problem
+
+Claygent's own language gives it away. Across v2 it says "the **available** site
+content", "the **reviewed** official pages", "the **available** wording". It is
+reasoning over a fetched snapshot of a few pages, not browsing and clicking.
+
+The proof is on the AB row. v2 says: *"A separate page contains a
+'virtual_experience' link, but the available wording does not describe product
+placement…"* — it **found a link and could not open it**, so it dismissed it.
+(That link is probably the 360° showroom tour, which correctly is not a design
+tool. But `/en/create3d/` is a different page, and it is still missed.)
+
+So instruction 3 — *try these paths directly on the domain* — is the one that
+would have caught both AB and Quemere, and **Claygent cannot execute it.**
+More pressure on that instruction only produces better-worded NONEs. Abitare
+is the cost: a correct BASIC became a wrong NONE because I made NONE feel
+like the rigorous answer.
+
+### The fix: two cheap passes, not one strict one
+
+**Pass 1 — Claygent, for positives only.** Trust ADVANCED, BASIC and MANUAL
+when a `tool_url` is returned. Do NOT trust NONE. Rename the value
+**UNCONFIRMED** in your own head so nobody segments on it.
+
+**Pass 2 — a SERP / Google-search column over the NONE rows.** A site-scoped
+search surfaces deep pages a crawler never navigates to. This is exactly how
+`/en/create3d/` and `designyourown.quemeredesigns.com` were found, both of
+which Claygent missed twice. Query per row:
+
+```
+site:{{domain}} (visualizer OR visualiser OR configurator OR configuratore
+OR configurador OR simulador OR "design your own" OR "create your own"
+OR 3D OR create3d OR stylist OR planner)
+```
+
+Then only send rows with a SERP hit back to Claygent to classify that specific
+URL. Cheaper than one exhaustive pass and it plays to each tool's strength:
+search finds pages, Claygent judges them.
+
+### Two wording fixes to stop the regression
+
+Add to the Rules block:
+- "If the site has collection filters, a colour or size finder, a style quiz
+  or a downloadable catalogue, that is **BASIC**. It is not NONE. NONE means
+  you found no picking mechanism of any kind."
+- "If you find a link whose name suggests a tool (virtual, 3D, experience,
+  configurator, stylist) but cannot open or read it, return **UNCONFIRMED**
+  with that URL in tool_url. Do not return NONE."
+
+And drop instruction 3 (direct path guessing) — it cannot be executed, and
+leaving it in invites the model to imply it tried.
+
+### Still outstanding
+
+- `tool_on_domain` and `tool_brand` were not created as columns, so the ABK
+  case still is not machine-readable.
+- `quemeredesigns.com` has still not been tested. It is the single most
+  informative row available.
+- `product_medium` flip-flopped on two rows between runs (4Design MIXED→FLAT_2D,
+  A.A.T.C. FLAT_2D→MIXED). Informational only, but it shows real run-to-run
+  variance, so do not treat any single Claygent field as deterministic.
