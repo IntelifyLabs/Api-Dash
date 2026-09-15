@@ -100,14 +100,32 @@ finished product to end customers, mark icp_fit REVIEW and explain.
 
 === PART 2: DO THEY ALREADY HAVE THE TOOL ===
 
-Check these places specifically:
-- the main navigation, and any "tools", "design", "inspiration" or
-  "professionals" section
-- a separate SUBDOMAIN or standalone app (e.g. design.example.com,
-  designyourown.example.com) - tools are often not in the main nav
-- product pages, which sometimes embed a picker or a room preview
-- anything named visualizer, visualiser, configurator, simulator, creator,
-  studio, lab, 3D, "design your own", "create your own", or an AI feature
+Reading the main navigation is NOT ENOUGH. In the 10-row test that was the
+single cause of failure: the tool existed and was reported as NONE because it
+was not in the top menu. Check ALL of the following before you may answer NONE.
+
+1. The main navigation, plus any "tools", "design", "inspiration",
+   "professionals", "trade" or "area riservata" section.
+2. **The FOOTER.** Design tools are very often linked only from the footer.
+3. **Try these paths directly on the domain.** This is mandatory, not
+   optional, and it is the cheapest way to avoid a false negative:
+     /configurator  /configuratore  /configurador  /create3d  /3d
+     /visualizer  /visualiser  /visualizador  /simulador  /simulatore
+     /design-your-room  /designyourown  /design-tools  /tools  /lab
+     /stylist  /studio  /room  /mosaic-tool  /planner
+4. **A separate SUBDOMAIN or standalone app** - design.example.com,
+   designyourown.example.com, mosaics.example.com. Tools are frequently
+   hosted off the main site entirely.
+5. **If {{company}} is a GROUP or parent company, check its BRAND sites.**
+   The group domain often has no tool while the brand site does. This is
+   common in Italian and Spanish ceramics: ABK Group's Virtual Stylist lives
+   on abk.it, not abkgroup.it; Appiani's three configurators live under
+   gruppobardelli.com/appiani/. 111 of 576 rows in this list look like groups
+   or carry sibling brands, so treat it as the norm, not an edge case.
+6. Product pages, which sometimes embed a picker or a room preview.
+7. Anything named visualizer, visualiser, configurator, simulator, creator,
+   stylist, studio, lab, planner, 3D, "design your own", "create your own",
+   or any AI feature.
 
 Classify into exactly one of four values:
 
@@ -154,11 +172,16 @@ Rules:
   has_prompt       yes or no
   tool_url         the exact URL of the tool or custom-offering page.
                    Required for ADVANCED, BASIC and MANUAL. Blank only for NONE
+  tool_on_domain   yes if tool_url is on {{domain}} itself; no if it is on a
+                   sibling brand site or another domain of the same group
+  tool_brand       if tool_on_domain is no, which brand or company the tool
+                   belongs to. Blank otherwise
   tool_evidence    one or two sentences quoting the site's own wording
   site_matches_company   yes or no
 
-Do not guess. If you cannot find a tool after checking the places listed
-above, return NONE. Never return a tool_url you did not actually open.
+Do not guess. Never return a tool_url you did not actually open. You may
+only return NONE after checking all seven places listed above, INCLUDING
+trying the direct paths and, for a group, the brand sites.
 ```
 
 ## Why has_tryon and has_prompt matter more than tool_level now
@@ -214,3 +237,57 @@ column produced two different ways cannot be segmented on.
 
 Revenue, employee count and headcount came back with the enrichment and cost
 nothing to gate on.
+
+
+## 10-row test results (16 Sept) — 8 clean, 1 misfiled, 1 real miss
+
+Accuracy was good and the two ICP catches Claygent made unprompted were
+correct: **ACIMAC** is the trade association for Italian ceramic machinery
+makers, and **4Puntozero / I Love Parquet** is a registered journalism portal.
+Both correctly OUT. **41zero42** came back NONE, which independently matches
+the search-based research — two different methods agreeing on one row.
+
+### Not an error: ABK
+
+Reported ADVANCED, has_tryon yes, url `abk.it/it/configuratore`. Shahwaz
+checked and could not find it. **Claygent was right.** ABK's Virtual Stylist
+is live — it matches surfaces, colours and formats onto images of real rooms,
+and a customer can upload a photo of their own space. There is a second Easy
+Living Configurator too.
+
+The confusion is that the row's domain is **abkgroup.it** (the parent) and the
+tool is on **abk.it** (the brand). Hence the new `tool_on_domain` and
+`tool_brand` fields: the finding was correct, it was just unfalsifiable from
+the row as written.
+
+### A real error: AB (Azulejos Benadresa) — FALSE NEGATIVE
+
+Reported NONE, evidence "site navigation lists Company, Product, Downloads,
+News, Contact; no customer-facing visualizer is identified."
+
+**It has one, on its own domain:** `azulejosbenadresa.com/en/create3d/` — the
+3D Superb program. Build your own 3D settings from the full tile range with
+multiple laying options and furniture for bathrooms, kitchens, living rooms,
+bedrooms and offices, in two versions, HOME for everyone and PRO restricted to
+professionals. There is also `/3d/version-hogar/`.
+
+Claygent read the top menu and stopped. `create3d` is not in it. This is the
+expensive direction of error: it silently deletes a company from the A/B
+cohort and would have had us open with "you have no design tool" to a company
+that segments its tool by audience.
+
+Same row also returned business_role DISTRIBUTOR; Benadresa is a Castellón
+manufacturer. A second inaccuracy on the one row Claygent read least of.
+
+### What to do
+
+The nav-only read is the whole problem, and both rows are explained by it. The
+revised Part 2 above makes the footer, the direct path guesses and the brand
+sites mandatory before NONE is allowed.
+
+**Re-run the 10 after the prompt change, and add `quemeredesigns.com`** — its
+builder sits on a `designyourown.` subdomain outside the nav, so it is the
+canary for exactly this failure. If Quemere and AB both come back ADVANCED,
+the prompt is fixed. Then spot-check 10 of the NONE rows from the full run
+before trusting that column, because NONE is now the value most likely to be
+wrong.
