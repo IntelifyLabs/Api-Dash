@@ -1,7 +1,7 @@
 # TRIMINAGE — GTM MASTER STATUS
 
 **Owner:** Shahwaz Hassan, GTM Engineer
-**Last updated:** 14 September 2026
+**Last updated:** 15 September 2026
 **Purpose:** single source of truth for every campaign — what was decided, what was tested, what was learned, and exactly where each workstream stopped.
 
 ---
@@ -903,6 +903,29 @@ Everything in this document is either verified against a file or listed here. No
 1. **Build the "build breakdown" asset.** It's promised in Campaign 1 and 2 CTAs and it doesn't exist. Every healthcare send is blocked behind it, and it's entirely within your control.
 2. **Get Abdullah's answer on what MEC is selling.** Asked twice. Everything in the MEC campaign except copy can proceed without it — but copy is the campaign.
 3. **Register the MEC domain today.** The 3-week warm-up is the only thing in any plan here that cannot be compressed. Starting it now means it finishes when the list is ready.
+
+## ⚠️ Competitive reality check (15 Sept 2026) — read before writing copy
+
+Researching prospect tooling surfaced the competitor set. Full detail in
+`wave2/q1/competitive_landscape.md`. The three findings that bind on §7.9:
+
+1. **Mozaico already ships text-to-mosaic.** Type a description in plain
+   English, the AI returns four options, pick one, give a size, they send a
+   sketch, price auto-calculates, it goes in the cart. A mosaic company, doing
+   MEC's whole proposition plus commerce. **This corrects a claim I made twice
+   on 14–15 Sept** that prompt-to-pattern was unique to MEC. It is not.
+2. **Mohawk gives the visualiser away.** Daltile runs four tools (Stylizer,
+   Stylizer AI with style presets and regenerate, a Mosaic Design Tool for
+   original designs, a Pattern Tool); Marazzi USA runs the same stack. Add
+   Appiani's MyCustom, Roomvo white-label, and ~10 free horizontal AI vendors.
+3. **24% of our own list already has one** — 23 of the 95 prospects researched
+   have an advanced configurator.
+
+**So the feature is not the differentiator.** What survives: composing from
+*the prospect's own* glazes, shapes and catalogue; running embedded on *their*
+domain so the lead stays theirs; and removing the specific human approval
+artefact (CAD drawing, sample book, glaze trial) that the 17 MANUAL rows pay
+staff for. Do not lead with "AI" — every competitor does.
 
 ## Open A/B tests to run
 | Campaign | Test |
