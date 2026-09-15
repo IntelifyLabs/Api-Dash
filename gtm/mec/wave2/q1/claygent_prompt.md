@@ -41,7 +41,15 @@ so those niches are in and the question to Abdullah is closed.
 2. Test the known-answer rows below first (standing rule 4).
 3. Read "the comparability trap" before segmenting.
 
-## The prompt
+## The prompt — THIS IS v1, RESTORED. Do not "improve" it.
+
+v1 measured 8 clean / 1 misfiled / 1 miss on the 10-row test. A hardened
+version that made the tool-hunt a mandatory 7-point checklist measured
+7 clean / 2 wrong: it did not fix the target row and it pushed a correct
+BASIC into a wrong NONE. The hardening is reverted. Its failure analysis is
+kept at the bottom of this file because the diagnosis is the useful part:
+NONE cannot be fixed by prompting, only by a second search pass.
+
 
 ```
 Visit {{domain}}. Answer two questions about {{company}}: does it fit our
@@ -100,32 +108,14 @@ finished product to end customers, mark icp_fit REVIEW and explain.
 
 === PART 2: DO THEY ALREADY HAVE THE TOOL ===
 
-Reading the main navigation is NOT ENOUGH. In the 10-row test that was the
-single cause of failure: the tool existed and was reported as NONE because it
-was not in the top menu. Check ALL of the following before you may answer NONE.
-
-1. The main navigation, plus any "tools", "design", "inspiration",
-   "professionals", "trade" or "area riservata" section.
-2. **The FOOTER.** Design tools are very often linked only from the footer.
-3. **Try these paths directly on the domain.** This is mandatory, not
-   optional, and it is the cheapest way to avoid a false negative:
-     /configurator  /configuratore  /configurador  /create3d  /3d
-     /visualizer  /visualiser  /visualizador  /simulador  /simulatore
-     /design-your-room  /designyourown  /design-tools  /tools  /lab
-     /stylist  /studio  /room  /mosaic-tool  /planner
-4. **A separate SUBDOMAIN or standalone app** - design.example.com,
-   designyourown.example.com, mosaics.example.com. Tools are frequently
-   hosted off the main site entirely.
-5. **If {{company}} is a GROUP or parent company, check its BRAND sites.**
-   The group domain often has no tool while the brand site does. This is
-   common in Italian and Spanish ceramics: ABK Group's Virtual Stylist lives
-   on abk.it, not abkgroup.it; Appiani's three configurators live under
-   gruppobardelli.com/appiani/. 111 of 576 rows in this list look like groups
-   or carry sibling brands, so treat it as the norm, not an edge case.
-6. Product pages, which sometimes embed a picker or a room preview.
-7. Anything named visualizer, visualiser, configurator, simulator, creator,
-   stylist, studio, lab, planner, 3D, "design your own", "create your own",
-   or any AI feature.
+Check these places specifically:
+- the main navigation, and any "tools", "design", "inspiration" or
+  "professionals" section
+- a separate SUBDOMAIN or standalone app (e.g. design.example.com,
+  designyourown.example.com) - tools are often not in the main nav
+- product pages, which sometimes embed a picker or a room preview
+- anything named visualizer, visualiser, configurator, simulator, creator,
+  studio, lab, 3D, "design your own", "create your own", or an AI feature
 
 Classify into exactly one of four values:
 
@@ -172,16 +162,11 @@ Rules:
   has_prompt       yes or no
   tool_url         the exact URL of the tool or custom-offering page.
                    Required for ADVANCED, BASIC and MANUAL. Blank only for NONE
-  tool_on_domain   yes if tool_url is on {{domain}} itself; no if it is on a
-                   sibling brand site or another domain of the same group
-  tool_brand       if tool_on_domain is no, which brand or company the tool
-                   belongs to. Blank otherwise
   tool_evidence    one or two sentences quoting the site's own wording
   site_matches_company   yes or no
 
-Do not guess. Never return a tool_url you did not actually open. You may
-only return NONE after checking all seven places listed above, INCLUDING
-trying the direct paths and, for a group, the brand sites.
+Do not guess. If you cannot find a tool after checking the places listed
+above, return NONE. Never return a tool_url you did not actually open.
 ```
 
 ## Why has_tryon and has_prompt matter more than tool_level now
