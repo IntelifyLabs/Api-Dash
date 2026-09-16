@@ -56,7 +56,7 @@ away rarely tell you why.
 MEC's version was seven weeks with three people. It is a project, not a platform
 migration.
 
-Glad to send the case study if it is useful.
+If you want to see what the output looks like before we speak: tryshowhouse.com
 
 ### Email 3 (send day 9)
 **Subject:** closing this out
@@ -142,6 +142,8 @@ has to picture a hand-brushed finish and then wait on a sample to confirm it.
 Worth knowing either way: Daltile and Marazzi both put one of these in front of
 their customers. At your size it is a far smaller build than theirs.
 
+Running version, no sign-up: tryshowhouse.com
+
 ### Email 3 (send day 9)
 **Subject:** leaving it here
 
@@ -225,6 +227,8 @@ on ceramicamayor.com instead of sending them to a designer to draw it.
 
 The pattern side is here if you want to poke at it: tryshowhouse.com
 
+Still happy to walk through how it would sit on your catalogue.
+
 ### Email 3 (send day 9)
 **Subject:** a question rather than a pitch
 
@@ -283,8 +287,56 @@ Worth twenty minutes?
 5. **Competitor rule.** MEC Artworks is a mosaic house. No tile or mosaic
    prospect gets a link to `ai.mecartworks.com`. They get a walkthrough offer, or
    `tryshowhouse.com`, which carries no competitor's name.
-6. **Links.** Touch 1 has none, per standing rule. Links appear at touch 2 only,
-   which is also the live A/B in section 11.
+6. **Links.** See the link policy below.
+
+## Link policy: tryshowhouse.com
+
+**Default: the link goes in touch 2, never touch 1, and never as the ask.**
+
+Three reasons it belongs in touch 2 and not touch 1:
+
+- A cold first email from `triminage.space` or `triminage.site` carrying a link
+  to a third, unrelated domain is a textbook filter pattern. Those TLDs are
+  already the campaign's known deliverability risk. Touch 2 goes to someone who
+  received touch 1, so the first message has already proved placement.
+- **The link cannot be the CTA.** The north star is replies and booked calls. A
+  click is not a reply, and with open and click tracking off (correctly) it is
+  not even measurable. So the link is evidence sitting next to the question, not
+  a replacement for it. One ask per message still holds.
+- Touch 1 is under 90 words and every word is doing work. The link buys nothing
+  there that the observation does not already buy.
+
+**Why tryshowhouse.com and not ai.mecartworks.com:** it carries no competitor's
+name. MEC Artworks is a mosaic house, and most of this list is tile and mosaic.
+ShowHouse is the only asset that can be sent to them safely. That is the single
+biggest argument for attaching a link at all.
+
+**Mechanics, all of which matter more than the copy:**
+- Plain URL, no anchor text, no shortener, no UTM string.
+- **Click tracking off in Instantly.** A tracking-domain redirect on a low
+  reputation TLD is a far worse signal than the naked link.
+- One link per email. No signature block, no social icons, no unsubscribe image.
+
+**The one A/B worth running** (this is the open test in section 11): put the
+link in touch 1 for **variant C only**. Variant C already makes a comparison
+claim, and a comparison claim is only credible if the reader can check it. Those
+prospects also own a visualiser, so they are the cohort most likely to click a
+rival one. Variants A and B get no touch-1 link in either arm.
+
+Touch-1 link arm for variant C, last two lines only:
+
+> We built the design engine behind MEC Artworks. Someone describes the pool in
+> plain words and gets an original layout drawn from your own tiles.
+>
+> It is running here if you want to try it: tryshowhouse.com
+>
+> Worth twenty minutes either way?
+
+**Blocking check before any of this sends.** I still cannot load
+tryshowhouse.com from here, so three things need eyes: that the page shows the
+prompt half and not just the try-on half, that nothing behind it demands a
+sign-up or a credit card, and that it loads on a phone. A dead or gated link in
+touch 2 is worse than no link at all.
 
 ## Two things to decide before these scale
 
