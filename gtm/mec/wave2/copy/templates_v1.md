@@ -40,46 +40,49 @@ shapes and glazes, while the customer is still interested.
 
 Want me to walk you through it?
 
-### Email 2 (send day 4)
-**Subject:** one number worth pulling
+### Email 2 (send day 4) — mechanism: do their manual step for them
+**Subject:** your CAD step, done in about a minute
 
 Katelyn,
 
-Something you can check without me. Take last quarter's custom enquiries and
-count the days between the first call and an approved CAD. Then count the ones
-that never reached approval at all.
+Rather than describe it, I did your step.
 
-The second number is the one that pays for this. Two days of a designer's time
-is also two days for a customer to change their mind, and the ones who drift
-away rarely tell you why.
+I took three glazes and two shapes off your collections page and had the tool lay
+out a floor in them. About a minute, and nobody opened CAD.
 
-MEC's version was seven weeks with three people. It is a project, not a platform
-migration.
+It is here: [render link]
 
-If you want to see what the output looks like before we speak: tryshowhouse.com
+It is not as good as your designer, and it is not meant to be. It is meant to be
+the thing a customer sees on Tuesday instead of the following Monday, so your
+designer only draws the jobs that are already sold.
 
-### Email 3 (send day 9)
-**Subject:** closing this out
+What would you change about it?
+
+### Email 3 (send day 9) — mechanism: hand off, or argue against yourself
+**Subject:** possibly the wrong Rookwood person
 
 Katelyn,
 
-Last one from me.
+Two possibilities and I cannot tell which from out here.
 
-If your design team has the capacity and the CAD step is not holding anything
-up, then this fixes a problem you do not have, and I would rather hear that than
-keep writing.
+One, this is not your call. If the website and the customer journey sit with
+somebody else, say the word and I will send them the render instead of you.
 
-If it is a bottleneck, Rookwood is an unusual case. A catalogue built from
-combinations is close to impossible to show on paper and straightforward to show
-on a screen.
+Two, I have read your process wrong. If the CAD drawing is quick, or if it is
+the part clients are actually paying for, then I have built an argument on
+something that is not a problem, and you would be doing me a favour by saying so.
 
-Either answer is worth having. Thanks for the time.
+The render stays up either way. Yours to use if it is any good.
 
 ### Slot map
 - `{observation}` the exact manual artefact, quoted from their site
 - `{combinatorial_fact}` what makes their catalogue impossible to show flat
 - `{cost_line}` the consequence in their terms, always time-to-approval
-- `{first_name}`
+- `{render_inputs}` the named glazes, shapes or collection the render was built
+  from. Must come off their own site, never invented
+- `{render_link}` their page on `tryshowhouse.com`
+- `{their_word_for_the_step}` CAD, sample book, glaze trial, pencils. Touch 3
+  reverses on this exact word
 
 ### Same template, different prospect (first touch only)
 **American Restoration Tile — Erin Oliver, erin@restorationtile.com**
@@ -125,46 +128,45 @@ and shapes on screen, so the choice becomes something you look at.
 
 Fifteen minutes to show you?
 
-### Email 2 (send day 4)
-**Subject:** the twenty artisans part
+### Email 2 (send day 4) — mechanism: give away a fact they can use, then show the work
+**Subject:** three of the four sites let them see it
 
 Josh,
 
-Being specific, because "design tool" covers a lot of ground.
+One thing worth having whether or not you ever reply to me.
 
-Two things. A customer uploads a photo of their room and sees your tile in it.
-Or they describe what they want in plain words and get an original layout back,
-drawn in your glazes.
+Daltile runs a visualiser. Marazzi runs one. A lot of mid-size makers run Roomvo,
+which is white-labelled, so it turns up under the maker's own name and a buyer
+never knows it was bought in. When a designer is comparing four tile sites in an
+afternoon, three of them let her see it and one asks her to imagine it.
 
-Neither touches your artisans. It replaces the step before them, where someone
-has to picture a hand-brushed finish and then wait on a sample to confirm it.
+I put four of your colour-ways on a hex layout to see how it reads on a screen:
+[render link]
 
-Worth knowing either way: Daltile and Marazzi both put one of these in front of
-their customers. At your size it is a far smaller build than theirs.
+Twenty people hand-brushing glaze is the whole argument. It should not be the
+part nobody sees.
 
-Running version, no sign-up: tryshowhouse.com
-
-### Email 3 (send day 9)
-**Subject:** leaving it here
+### Email 3 (send day 9) — mechanism: no ask at all
+**Subject:** the file, no strings
 
 Josh,
 
-I will stop after this.
+I am not asking you for anything in this one.
 
-If your buyers are designers who can already picture the result, that is a real
-answer and it closes the question for me.
+The render from last week is yours. Put it on the colour-ways page, recrop it,
+bin it. No attribution, no catch. It took a minute to make and it is worth more
+to you than to me.
 
-If it is that nobody has had time to build it, that is the usual answer, and it
-is why MEC's took seven weeks with three people rather than a year.
-
-The hand-brushed glaze is the part nobody can copy. It just deserves to be seen
-before someone commits.
+If you ever want the thing that made it sitting on syzygytile.com, you know where
+I am. If not, that is a fine outcome too.
 
 ### Slot map
 - `{promise}` the choice they advertise, quoted
 - `{friction}` what the buyer does instead today: sample, quote form, PDF
 - `{craft_fact}` the thing that must not sound automated
 - `{competitor_line}` only where true. Daltile, Marazzi and Roomvo are verified
+- `{render_link}` optional here. If no render was made, cut that line and the
+  touch-3 giveaway becomes "here is the tool" instead of "here is the file"
 
 ### Same template, different prospect (first touch only)
 **41zero42 — Frederic Ades, f.ades@41zero42.it**
@@ -210,47 +212,42 @@ plain words and gets an original layout drawn from your own tiles.
 
 Want to see it running?
 
-### Email 2 (send day 4)
-**Subject:** what the simulator cannot answer
+### Email 2 (send day 4) — mechanism: use their own tool, and report where it stopped
+**Subject:** I spent ten minutes in Design Your Pool
 
 Eva,
 
-The difference in one line.
+I used your tool before I wrote to you the first time.
 
-Yours starts from your catalogue and lets people arrange it. This starts from a
-sentence and produces something that was never in the catalogue, then places it
-in the client's own photo.
+I tried to build one specific thing in it: [the exact request that hit the wall].
+It will not do that, because it is built to arrange the tiles you already make
+rather than invent an arrangement you have not made yet. That is not a fault, it
+is what the tool is for.
 
-You have already paid for the first half, which is exactly why I wrote to you
-and not to a company with nothing. The second half is what keeps that customer
-on ceramicamayor.com instead of sending them to a designer to draw it.
+Then I described the same pool in one sentence to ours: [render link]
 
-The pattern side is here if you want to poke at it: tryshowhouse.com
+Same tiles. A different question being answered. Yours answers which of these.
+The other answers what if.
 
-Still happy to walk through how it would sit on your catalogue.
-
-### Email 3 (send day 9)
-**Subject:** a question rather than a pitch
+### Email 3 (send day 9) — mechanism: one line
+**Subject:** one question
 
 Eva,
 
-Last note.
+Where does a customer go when Design Your Pool does not have what they came for?
 
-An honest question, and you are one of very few people who can answer it. When
-somebody opens Design Your Pool and none of the combinations is what they came
-for, where do they go next?
-
-If the answer is your sales team, that is a cost. If it is another brand's site,
-that is worse. If they buy anyway, then I have this wrong and I would genuinely
-like to know.
-
-Thanks for reading this far.
+That is the whole email.
 
 ### Slot map
 - `{their_tool_name}` always the exact name: Design Your Pool, Roomviewer, Virtual Viewer, Stylizer
 - `{honest_praise}` one true thing it does well
 - `{edge}` the request it cannot serve
 - `{domain}` used in email 2 to make the "stays on your site" point land
+- `{the_wall}` **the single highest-value and highest-risk slot in the whole
+  document.** The specific thing somebody tried to build in their tool and could
+  not. It has to be real. Whoever fills it opens the tool, attempts one concrete
+  request, and writes down where it stopped. If that has not happened, the row
+  does not get this email
 
 ### Same template, different prospect (first touch only)
 **Cotto d'Este — Matteo Iseppi, matteo.iseppi@cottodeste.it**
@@ -272,6 +269,58 @@ Worth twenty minutes?
 
 ---
 
+## Why the follow-ups are built this way
+
+A follow-up that explains the product again is a bump wearing a hat. The reader
+has already heard the argument. What they have not had is something arrive.
+
+So every follow-up here is a **move**, not a paragraph. No message in this
+document opens with "just checking in", "circling back", "bumping this" or "last
+one from me". The breakup email is deliberately absent from all three variants,
+because every prospect on this list has received forty of them.
+
+| | Touch 2 move | Touch 3 move |
+|---|---|---|
+| A | Perform their manual step and send the result | Offer to hand off to the right person, or argue against your own case |
+| B | Give away a competitive fact they can use, then show the render | Give the file away with no ask attached |
+| C | Use their tool, hit its wall, report exactly where | One sentence, one question |
+
+**The four moves worth keeping in the bank**, in order of how hard they are to
+ignore:
+
+1. **Do the work.** Arrive with the artefact instead of the offer. Only possible
+   because the tool exists and their catalogue is public.
+2. **Use their own tool and tell them what it would not do.** Requires ten real
+   minutes and cannot be faked. This is the single least generic email available
+   to this campaign.
+3. **Remove the ask.** A message with nothing in it for the sender is the one
+   people answer. It also costs nothing, because the artefact already exists
+   from touch 2.
+4. **Question your own premise.** "I may have read you wrong, tell me if I did"
+   gets a correction, and a correction is a reply.
+
+## What this costs to produce, honestly
+
+These follow-ups are not free, and pretending otherwise would put the campaign
+back where campaign 2 was.
+
+- **Touch 2 for A and B needs one render per prospect.** Collection names, glaze
+  names and shapes are on their site and already partly captured in
+  `Use AI Tool Evidence`, so the input is cheap. The render is not zero.
+- **Touch 2 for C needs somebody to actually open their tool.** Ten minutes a
+  prospect. **Never invent the limitation.** If the wall in that email is made
+  up and the reader knows their own product, the whole sequence is dead and so
+  is the sender reputation. If nobody has time to open the tool, use a different
+  touch 2.
+- **Do not attach the render as a file.** Image attachments from a low
+  reputation TLD are a filter pattern. Host each render on its own page and link
+  it, as a per-prospect page under `tryshowhouse.com`.
+
+**Tiering that makes this affordable:** run the artefact version on variant A
+(34 reachable) and variant C (57), which is about 90 prospects and the two
+highest-intent cuts on the list. For the long tail in variant B, keep move 3 and
+move 4, which need no render at all, and drop the render line from touch 2.
+
 ## Rules these obey
 
 1. **Four-block structure** (standing rule 13): verifiable observation from
@@ -292,6 +341,14 @@ Worth twenty minutes?
 ## Link policy: tryshowhouse.com
 
 **Default: the link goes in touch 2, never touch 1, and never as the ask.**
+
+**The touch-2 link is now a per-prospect page, not the homepage.** Every
+follow-up above carries `[render link]`, which should resolve to something like
+`tryshowhouse.com/r/rookwood`: their render on the page, and a button under it
+that opens the tool with their palette already loaded. That is strictly better
+than a bare homepage link. The reader lands on their own tile, not on a pitch,
+and the domain is still the neutral one. `tryshowhouse.com` on its own stays as
+the fallback wherever no render was produced.
 
 Three reasons it belongs in touch 2 and not touch 1:
 
