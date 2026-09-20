@@ -290,9 +290,9 @@ S3 = {
  'BA': ['the renders will look fake, right',
         "the bit people don't say out loud",
         'judge it yourself rather than take my word'],
- 'CB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
- 'AB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
- 'BB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
+ 'CB': ['one question', 'what do you know tomorrow morning', 'how many did you get a name for'],
+ 'AB': ['one question', 'what do you know tomorrow morning', 'how many did you get a name for'],
+ 'BB': ['one question', 'what do you know tomorrow morning', 'how many did you get a name for'],
 }
 
 # The record itself, written the way Showhouse writes it on its own page, so
@@ -363,8 +363,6 @@ def _b3(f, dom, url, co):
     if (hash((f, co)) & 1):
         return f"""Hello {f},
 
-Two lines and then I'll stop.
-
 If somebody lands on {dom} tonight and falls for one of your collections, what do you actually know about them tomorrow morning?
 
 If the answer is nothing, that's the whole reason I wrote.
@@ -372,7 +370,7 @@ If the answer is nothing, that's the whole reason I wrote.
 {url}"""
     return f"""Hello {f},
 
-Last one, and it's a genuine question rather than a pitch.
+A genuine question rather than a pitch.
 
 Out of everyone who looked at {dom} last month, how many did you get a name for?
 
@@ -398,8 +396,6 @@ Have a go on a photo of your own room: {url}
 Want me to load some {co} products in first?"""
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
-
-I'll leave it here after this.
 
 You've already got the render part, so the fair question is why bother at all.
 
@@ -444,8 +440,6 @@ Try it on a photo of your own room: {url}
 Want me to load some {co} products in first?"""
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
-
-Last one from me.
 
 The thing people usually push back on is that they don't want a machine sitting between them and the client. Which is fair, that conversation is the job.
 
@@ -499,7 +493,7 @@ Want me to load some {co} products in first?"""
         if (hash((f, co)) & 1):
             b3 = f"""Hello {f},
 
-Last one from me, and it's the bit people don't usually write back to say.
+Here's the bit people don't usually write back to say.
 
 The worry is normally one of two things. Either the renders come out looking fake, or your products are too particular for something like this to get right.
 
@@ -510,8 +504,6 @@ Both fair. It's why it only ever renders what's actually in your catalogue, your
 If it's a no, just say no and I'll leave you be."""
         else:
             b3 = f"""Hello {f},
-
-Last one from me.
 
 The usual reason this goes nowhere isn't that people dislike the idea. It's that it sounds like a project, and nobody has a spare quarter to give it.
 
