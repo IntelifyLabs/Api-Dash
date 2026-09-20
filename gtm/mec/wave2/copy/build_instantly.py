@@ -48,7 +48,9 @@ def best_quote(ev):
     rows over it. Phrases also quote better than paragraphs."""
     out = []
     for q in QUOTE.findall(ev or ''):
-        q = q.strip().rstrip(',;:').strip()
+        # Trailing punctuation has to go, or the quote lands as
+        # 'On your own site: "Solicita una reunion con nosotros.".'
+        q = q.strip().rstrip(',;:.!?\u2026').strip()
         if q.endswith(','): continue
         n = len(q.split())
         if n < 4 or n > 13: continue
@@ -136,307 +138,303 @@ def titlecase_company(c):
     return c
 
 # ─────────────────────────── studio pages ───────────────────────────
-# Email 1 now carries the link, reversing the earlier "no link in touch 1"
-# call. Shahwaz overruled it: the page is the closer and holding it back asks
-# people to reply blind. The link is the CATEGORY page, never the homepage, so
-# a tile manufacturer lands on tile work rather than a general pitch.
+# VERIFIED against the live site on 20 Sept, replacing five guessed slugs.
+# /stone and /bathroom do not exist and were sending people to a 404. The
+# site's own segmentation puts stone under Tile & Stone, described as "tile
+# showrooms, stone yards, surface distributors", so stone routes to /tile.
 #
-# ⚠ PATHS ARE UNCONFIRMED. tryshowhouse.com cannot be loaded from this
-# environment (the proxy answers 403 to CONNECT), so these five slugs are
-# proposed, not verified. Correct them in this one dict and rebuild. A wrong
-# path sends 390 people to a 404, which is worse than sending them nowhere.
+# Five studios are live: tile, rugs, wallpaper, countertops, mosaic.
+# /furniture and /gardens have URLs in the industries list but are NOT in the
+# "five live studios" block, so nothing is routed to them.
 BASE = 'https://www.tryshowhouse.com'
-STUDIO = {'tile': '/tile', 'mosaic': '/mosaic', 'stone': '/stone',
-          'wallpaper': '/wallpaper', 'bathroom': '/bathroom'}
+STUDIO = {
+    'tile':        ('/tile',        'Tile Studio'),
+    'rugs':        ('/rugs',        'Rug Studio'),
+    'wallpaper':   ('/wallpaper',   'Mural Studio'),
+    'countertops': ('/countertops', 'Surface Studio'),
+    'mosaic':      ('/mosaic',      'Mosaic Studio'),
+}
 
 def studio_key(cat, niche, desc):
-    """Route on the PRODUCT CATEGORY first, and only fall back to the long
-    description. Reading them as one blob sent Aparici, a ceramic tile maker,
-    to the wallpaper page, because its description says "wall coverings" and
-    the wallpaper test ran first. Every tile company on earth writes "floor and
-    wall coverings", so that phrase is no longer a wallpaper signal: wallpaper
-    now needs the actual word, in one of the four languages on this list.
+    """Route on PRODUCT CATEGORY first, description only as fallback.
 
-    `niche` is deliberately NOT consulted. It is a SOURCE LABEL, not evidence:
-    every Cersaie row carries "Ceramic / Tile (verify)" regardless of what the
-    company makes, so including it routed AIP Porte, a maker of interior doors,
-    to the tile studio. This is the second time that column has poisoned a
-    classifier in this campaign; the first was the core-niche test in
-    q1/classify.py, which passed all 476 Cersaie rows as tile.
+    `niche` is deliberately never consulted. It is a SOURCE LABEL, not
+    evidence: every Cersaie row carries "Ceramic / Tile (verify)" whatever the
+    company makes, which routed AIP Porte, a maker of interior doors, to the
+    tile studio. Second time that column has broken a classifier here; the
+    first was the core-niche test in q1/classify.py.
 
-    A row that matches nothing returns blank and links to the homepage rather
-    than to a page that does not fit. There is no door studio, so AIP Porte
-    gets the homepage, and `qa_studio` is blank so those rows are findable."""
+    "wall coverings" is not a wallpaper signal either. Every tile company on
+    earth writes "floor and wall coverings", which sent Aparici, a ceramic tile
+    maker, to the mural studio. Wallpaper needs the actual word.
+
+    A row matching nothing returns blank. Those companies sell sanitaryware,
+    taps, doors or radiators, and Showhouse has no studio for any of them, so
+    they are a QUALIFICATION problem rather than a copy problem. They are
+    flagged, not papered over."""
     cat = (cat or '').lower()
     desc = (desc or '')[:300].lower()
-    niche = (niche or '').lower()
-
-    def hit(pat, *fields):
-        return any(re.search(pat, f) for f in fields)
-    del niche                       # see the docstring: source label, not evidence
+    def hit(pat, *f): return any(re.search(pat, x) for x in f)
 
     TILE = r'tile|ceramic|porcelain|stoneware|\bgres\b|terracotta|cotto|klinker|azulejo|piastrell|seramik'
-    if hit(r'\bmosaic|mosaico|mozaik', cat):                         return 'mosaic'
-    if hit(r'wallpaper|wall paper|wallcovering|mural|tapet|'
-           r'carta da parati|papel pintado', cat, desc):              return 'wallpaper'
-    if hit(TILE, cat):                                                return 'tile'
-    if hit(r'marble|travertine|granite|natural stone|quartz|\bstone\b|marmo|marmol', cat):
-        return 'stone'
-    if hit(r'faucet|sanitary|shower|bathroom|\btap\b|basin|bathtub|washbasin|grifer', cat):
-        return 'bathroom'
-    if hit(r'\bmosaic', desc):                                              return 'mosaic'
-    if hit(TILE, desc):                                                      return 'tile'
+    if hit(r'\bmosaic|mosaico|mozaik', cat):                                    return 'mosaic'
+    if hit(r'wallpaper|wall paper|wallcovering|mural|tapet|carta da parati|papel pintado', cat, desc):
+        return 'wallpaper'
+    if hit(r'\brug\b|\brugs\b|carpet|moquette|alfombra', cat):                   return 'rugs'
+    if hit(TILE, cat):                                                          return 'tile'
+    if hit(r'countertop|worktop|benchtop|\bslab|quartz|granite|sintered', cat):  return 'countertops'
+    if hit(r'marble|travertine|natural stone|\bstone\b|marmo|marmol', cat):      return 'tile'
+    if hit(r'\bmosaic', desc):                                                  return 'mosaic'
+    if hit(TILE, desc):                                                         return 'tile'
     return ''
 
 # ─────────────────────────────── copy ───────────────────────────────
-# Rewritten 19 Sept against Shahwaz's feedback. Four changes, all deliberate:
+# Rewritten 20 Sept against the live Showhouse page, which corrected the angle
+# a third time. The product is a white-label AI visualiser AND lead engine: a
+# shopper photographs their own room, the brand's product appears in it, a
+# guided finder turns their answers into a written brief, and the image unlocks
+# only once they verify an email. The brand receives render, brief and a real
+# address in one dashboard record.
 #
-# 1. The product is no longer described as "a design tool". That framing sells
-#    a feature nobody is short of, and it is what Daltile and Marazzi already
-#    give away. What the buyer is short of is a NAMED lead. So the pitch is the
-#    lead record: the render, the exact products chosen, and the contact
-#    details, arriving in a dashboard their sales team works from.
-# 2. Each of the six messages per company now carries a different reason to
-#    reply. Thread A runs lead capture, then catalogue integration, then the
-#    MEC build and the timeline. Thread B runs search and positioning, then
-#    what the sales team receives, then speed to go live. Previously all three
-#    restated the same argument at different lengths.
-# 3. MEC Artworks leads with nothing. The name means nothing to a tile plant in
-#    Castellon, so it appears as proof in message three, never as the opening,
-#    and it is always described ("a mosaic manufacturer") rather than assumed.
-# 4. Register lifted for European B2B. Most of this list is Italian, Spanish,
-#    Portuguese and Turkish. Gone: "straight with you", "poke at it", "you know
-#    where I am", "I am out of your inbox".
+# So the two previous framings were each half right and each wrong alone. The
+# first sold "a design tool", which is a feature Daltile and Marazzi give away.
+# The second sold the lead record, which is true but abstract in line one. The
+# site itself resolves it: "A visualiser is the hook. The pipeline is the
+# product." Copy therefore OPENS on the mechanic, because a customer seeing
+# your tile on their own floor is instantly picturable, and CLOSES on the
+# pipeline, because that is what pays for it.
 #
-# Unchanged: no dash of any kind, no filtered word, short paragraphs, no
-# signature block. First emails now run to 100 words rather than 90, because a
-# link and a concrete deliverable will not fit in 90 and the extra fifteen
-# words buy the thing the feedback asked for.
+# Three things the page fixed that no amount of rewriting would have:
+#   - The product is called Showhouse. Nothing said so before.
+#   - There is no self-serve trial, so "start a trial" was an offer we cannot
+#     honour. The real ladder is: open a live studio, which needs no sign in,
+#     then a demo where the team arrives with the prospect's catalogue loaded.
+#   - The studios are openable and render a visitor's own photo. That makes
+#     message one's ask genuinely free: look at a page and upload a photo.
 #
-# ⚠ HONEST-PROOF. The only MEC figures used are the two published ones, seven
-# weeks and a team of three. The case study carries no performance numbers, so
-# none are claimed. If Abdullah can get one real figure out of MEC (leads
-# captured per month, or time on page before and after) message three in both
-# threads becomes materially stronger. That is the single highest-value thing
-# missing from this copy.
+# Wording is borrowed from the page wherever it is sharper than mine:
+# "before they order a sample", "every wall becomes a live product page",
+# "without touching anything else in the photo", "live in weeks, not quarters".
 
-# Near-identical phrasing across the majority of emails was copy defect number
-# four on campaign 2, and follow-ups are where it creeps back: the argument is
-# the same for every row in a segment, so the subject line collapses to one
-# string across 200 addresses. Each follow-up therefore draws from a bank,
-# keyed on a hash of the address so the choice is stable across rebuilds and
-# the two people at one company still land on different lines.
 def pick(bank, email, salt):
+    """Near-identical phrasing across a segment was copy defect four on
+    campaign 2, and follow-ups are where it returns: one argument per segment
+    collapses to one subject line across 200 addresses. Keyed on the address so
+    the choice is stable across rebuilds, and the two people at one company
+    still land on different lines."""
     return bank[(hash((email, salt)) & 0x7fffffff) % len(bank)]
 
 S2 = {
- 'CA': ['renders made only from what you actually sell',
-        'it runs on your catalogue, not a stock library',
-        'why the lead is worth opening',
-        'every render is a specification you can quote'],
- 'AA': ['your own catalogue, not a generic library',
-        'from a written brief to an approved visual',
+ 'CA': ['a visualiser is the hook, the pipeline is the product',
+        'what happens after the image appears',
+        'the brief arrives written, by the shopper',
+        'a verified address, not a form fill'],
+ 'AA': ['the brief written by the client, not your team',
+        'what happens after the image appears',
+        'from a room photo to a written specification',
+        'a verified address, not a form fill'],
+ 'BA': ['a visualiser is the hook, the pipeline is the product',
+        'what happens after the image appears',
+        'the brief arrives written, by the shopper',
+        'a verified address, not a form fill'],
+ 'CB': ['which finishes people pick, and which nobody does',
+        'every render and every drop off',
+        'the part your visualiser does not record',
+        'what the funnel would tell you'],
+ 'AB': ['the enquiry that arrives already specified',
+        'every render and every drop off',
         'what your team stops having to draw',
-        'the descriptions your team works from today'],
- 'BA': ['renders made only from what you actually sell',
-        'your collections, not a stock library',
-        'what makes the lead worth opening',
-        'a specification rather than a mood board'],
- 'CB': ['what lands in your dashboard',
-        'the record your sales team receives',
-        'a lead with the render attached',
-        'who designed it, and what they chose'],
- 'AB': ['what your team receives',
-        'a lead with the drawing already done',
-        'the record that reaches your desk',
-        'who it was, and what they chose'],
- 'BB': ['what lands in your dashboard',
-        'the record your sales team receives',
-        'a lead with the render attached',
-        'who designed it, and what they chose'],
+        'what the funnel would tell you'],
+ 'BB': ['which finishes people pick, and which nobody does',
+        'every render and every drop off',
+        'the record behind each render',
+        'what the funnel would tell you'],
 }
 S3 = {
- 'A': ['seven weeks from brief to live',
-       'how long this actually takes',
+ 'A': ['live in weeks, not quarters',
+       'your catalogue, already loaded',
        'the timeline, and then I will stop',
-       'what seven weeks bought MEC Artworks'],
- 'B': ['seven weeks, and then it is yours',
-       'the timeline, and a straight question',
-       'what this looks like as a project',
-       'closing this out with the timeline'],
+       'what the build actually involves'],
+ 'B': ['your catalogue, already loaded',
+       'live in weeks, not quarters',
+       'closing this out with the timeline',
+       'a straight question before I stop'],
 }
 
-def variant_C(f, co, dom, tool, hook, thread, partner, url):
-    """Already runs a visualiser. Never suggest they lack a tool. The gap is
-    that their tool is anonymous: it renders, then the visitor disappears."""
+DEMO = 'https://www.tryshowhouse.com/#book'
+
+# Message 1 needs a bank too. Variants A and C vary naturally, because their
+# subjects carry the prospect's own tool name or their own quoted line, but
+# variant B is 273 of the 390 rows and had one fixed string, so 220 addresses
+# were receiving an identical subject. That is the campaign-2 defect exactly.
+S1 = {
+ 'BA': ['your products, in their own room',
+        'what {dom} cannot show them',
+        'the room they are standing in',
+        'a photograph of their room, and your tile in it'],
+ 'BB': ['every wall becomes a live product page',
+        'the page they show their partner',
+        'a catalogue is browsed and left',
+        'what a visitor leaves behind'],
+}
+
+def variant_C(f, co, dom, tool, hook, thread, partner, url, lab):
+    """Already runs a visualiser. Never suggest they lack one. Their tool is
+    the hook; what they do not have is the pipeline behind it. This is the
+    site's own argument and it lands hardest on exactly this cohort."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = f'what {t} does not send to your sales team'
+        s1 = f'{t} shows the room, and then what'
         b1 = f"""Hello {f},
 
-{co} already runs {t}, so a visitor can see a surface in their own room.
+{co} already runs {t}, which puts you ahead of most of this category.
 
-What it does not do is tell you who that visitor was. They design, they close the tab, and the interest is gone.
+The question is what happens after the image appears. Someone renders a room, likes what they see, and leaves without a name attached.
 
-We build the same experience with a lead layer underneath. The visitor keeps the render. You receive the render, the exact products they chose and their contact details, as a record your team can act on.
+Showhouse is the same render under your own brand and domain, except the image unlocks once the visitor verifies an email. The lead reaches you with the picture and a written brief already on it.
 
-Our work in your category: {url}
+Open it and render a photo of your own room: {url}
 
-Shall I set one up on {co} products?"""
-        s2 = 'renders made only from what you actually sell'
+Shall I have {co} products loaded before we speak?"""
         b2 = f"""Hello {f},
 
-The detail that decides whether this is worth your time: it runs on your catalogue, not a generic material library.
+Anyone can put a render button on a website. What pays for it is everything after the image.
 
-We load your collections, formats and finishes. Anything a visitor produces is therefore a specification your team can quote and ship, with no approximate colours and no surfaces you do not make.
+A short guided finder asks the shopper about style, colour and space. Their answers become a written brief. The image unlocks only once the email is verified, so the address reaching your team is real.
 
-That is also what makes the lead valuable. Your salesperson opens it already knowing the products, the room and the person.
+Your salesperson opens one record: the render, the brief, the products and a genuine contact.
 
 {url}
 
-Send me one collection name and I will build it into a working version for you."""
-        s3 = 'seven weeks from brief to live'
+We can load {co} products and walk you through a shopper's journey end to end: {DEMO}"""
         b3 = f"""Hello {f},
 
 The last thing worth knowing is the timeline.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with a team of three. It is live and their team uses it daily. That is the realistic schedule for a branded version on your own domain, not a twelve month platform project.
+The engine is built. Most of the work is catalogue preparation and branding, so it goes live in weeks under your own logo and domain, not in quarters.
 
-If this sits with a colleague rather than with you, tell me who and I will approach them instead.
+The Mosaic Studio on the site is the original build, running for MEC Artworks today.
 
-{url}"""
+If you would like to see it with {co} products already loaded, I can arrange that: {DEMO}"""
     else:
-        s1 = 'the page visitors stay on'
+        s1 = 'the part a visualiser does not record'
         b1 = f"""Hello {f},
 
 A note about {dom} rather than a pitch.
 
-{co} already runs {t}, which puts you ahead of most of the category. The next move is what that traffic leaves behind: right now a visitor designs, then leaves anonymously.
+{co} already lets a visitor preview products in a room. What that does not leave you with is the record of what they tried.
 
-We build the same experience so the visitor keeps the render and you keep the lead, with the products chosen and the contact details attached.
+Showhouse keeps all of it. Every render and every drop off, so you can see which finishes people choose and which ones nobody ever picks, alongside a verified email for each one.
 
-There is a positioning argument too. Daltile and Marazzi both went this way. In your market it is still open.
+The studio is open, no sign in needed: {url}
 
-{url}"""
-        s2 = 'what lands in your dashboard'
+Worth a look?"""
         b2 = (f"""Hello {f},
 
-To be concrete about the output, since the value sits in what your team receives.
+To be concrete about the output, since that is where the value sits.
 
-A visitor finishes a design. You get one record: the rendered room, the products and formats used, and their name and email address. Your team then calls somebody who has already chosen.
+A shopper answers a few questions about style, colour and space, renders the room, then verifies an email to keep the image. You receive one record: the render, the brief in their own words, the products, and an address that is real.
 
 I wrote to {partner} as well, since I could not tell from outside which of you owns the website.
 
+{url}"""
+              if partner else f"""Hello {f},
+
+To be concrete about the output, since that is where the value sits.
+
+A shopper answers a few questions about style, colour and space, renders the room, then verifies an email to keep the image. You receive one record: the render, the brief in their own words, the products, and an address that is real.
+
 {url}
 
-Name one collection and I will build it into a version for you.""" if partner else f"""Hello {f},
-
-To be concrete about the output, since the value sits in what your team receives.
-
-A visitor finishes a design. You get one record: the rendered room, the products and formats used, and their name and email address. Your team then calls somebody who has already chosen.
-
-{url}
-
-Name one collection and I will build it into a version for you.""")
-        s3 = 'seven weeks, and then it is yours'
+Worth twenty minutes with your own catalogue in it?""")
         b3 = f"""Hello {f},
 
 Closing this out.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with three people, and it runs on their site today. A branded version for {co}, on your own catalogue and your own domain, is the same order of work.
+It runs under your brand on your own domain, and it goes live in weeks rather than quarters, because the engine is built and the work is catalogue preparation.
 
-If it is not a priority this year, say so and I will leave it there. If it is, the fastest first step is a collection name.
+If it is not a priority this year, say so and I will leave it there. If it is, we will arrive with {co} products already loaded and walk through a shopper's journey start to finish: {DEMO}"""
+    return s1, b1, pick(S2['C'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3
 
-{url}"""
-    return s1, b1, s2, b2, s3, b3
-
-def variant_A(f, co, dom, tool, hook, thread, partner, url):
-    """A person does the visualising today. The enquiry arrives as a
-    description and somebody has to turn it into a picture before anything
-    moves. Replace that step, never the craft behind it."""
+def variant_A(f, co, dom, tool, hook, thread, partner, url, lab):
+    """A person does the visualising today, and a physical sample usually
+    follows. The site's own line for this is "before they order a sample"."""
     line = f'On your own site: "{hook}".' if hook else \
-           f'{co} sells bespoke work, and the way a client starts one is to contact your team.'
+           f'{co} sells bespoke work, and a client starts one by contacting your team.'
     if thread == 'A':
-        s1 = 'the enquiry that arrives without a picture'
+        s1 = 'before they order a sample'
         b1 = f"""Hello {f},
 
 {line}
 
-Every one of those enquiries reaches your team as a description, and somebody then has to turn it into a visual before the conversation can move forward.
+Every one of those enquiries reaches your team as words, and somebody then has to turn it into a picture before anything moves. A sample goes in the post and a week disappears.
 
-We move that step into the website. The client produces the visual from your own products, and it reaches your team as a complete lead: the render, the products chosen and the contact details.
+Showhouse puts that step on your website. The client photographs their own room, your product appears in it, and it reaches you as a lead with the render and a written brief attached.
 
-Our work in your category: {url}
+Render a photo of your own room here: {url}
 
-Shall I load a few {co} products into one for you?"""
-        s2 = 'your own catalogue, not a generic library'
+Shall I have {co} products loaded before we speak?"""
         b2 = f"""Hello {f},
 
-The detail that decides whether this is worth your time: it runs on your own catalogue.
+The part that matters is what your team stops doing.
 
-We load your collections, formats and finishes, so whatever a client produces is a specification you can quote and make. Nothing comes back in a colour you do not make.
+A guided finder asks the client about style, colour and space, and their answers become a written brief. It renders only inside your catalogue, your finishes and your size rules, so nothing comes back that you cannot make.
 
-Your team stops working from written descriptions and starts working from a visual the client has already approved.
+The enquiry arrives specified, with a verified email on it, rather than as a description somebody has to interpret.
 
 {url}
 
-Send me one collection name and I will build it into a working version."""
-        s3 = 'seven weeks from brief to live'
+We can load {co} products and walk you through it end to end: {DEMO}"""
         b3 = f"""Hello {f},
 
 The last thing worth knowing is the timeline.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with a team of three. It is live and in daily use. That is the realistic schedule for a branded version on {dom}.
+The engine is built, so most of the work is catalogue preparation and branding. It goes live in weeks under your own logo and domain.
 
-If this sits with a colleague, tell me who and I will approach them instead.
+The Mosaic Studio on the site is the original build, running for MEC Artworks today.
 
-{url}"""
+If this sits with a colleague rather than with you, tell me who and I will approach them instead: {DEMO}"""
     else:
         s1 = 'the visitors who never get in touch'
         b1 = f"""Hello {f},
 
 {line}
 
-Most visitors will not do that. Not from lack of interest, but because they cannot yet picture what they would be asking for. They leave, and you never learn who they were.
+Most visitors will not do that. Not from lack of interest, but because they cannot picture what they would be asking for yet. They leave, and you never learn who they were.
 
-We change what the website does with that traffic. The visitor builds the picture from your own products, and you receive it as a lead with their contact details attached.
+Showhouse changes what the website does with that traffic. The visitor photographs their room, your product appears in it, and the image unlocks once they verify an email.
 
-Our work in your category: {url}
+The studio is open, no sign in needed: {url}
 
-Shall I set one up on {co} products?"""
-        s2 = 'what your team receives'
+Worth a look?"""
         b2 = (f"""Hello {f},
 
-To be concrete about the output, since that is where the value is.
+To be concrete about what reaches your team.
 
-A visitor finishes a design. You get one record: the rendered room, the exact products and formats used, and their name and email. Your team then speaks to somebody who has already decided.
+The shopper answers a few questions about style, colour and space, renders their own room, then verifies an email to keep the picture. You get one record: the render, the brief in their words, the products, and a real address.
 
 I wrote to {partner} as well, since I could not tell from outside which of you owns the website.
 
+{url}"""
+              if partner else f"""Hello {f},
+
+To be concrete about what reaches your team.
+
+The shopper answers a few questions about style, colour and space, renders their own room, then verifies an email to keep the picture. You get one record: the render, the brief in their words, the products, and a real address.
+
 {url}
 
-Name one collection and I will build it into a version for you.""" if partner else f"""Hello {f},
-
-To be concrete about the output, since that is where the value is.
-
-A visitor finishes a design. You get one record: the rendered room, the exact products and formats used, and their name and email. Your team then speaks to somebody who has already decided.
-
-{url}
-
-Name one collection and I will build it into a version for you.""")
-        s3 = 'seven weeks, and then it is yours'
+Worth twenty minutes with your own catalogue in it?""")
         b3 = f"""Hello {f},
 
 Closing this out.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with three people, and it runs on their site today. A branded version for {co} is the same order of work.
+It carries your logo, your colours and your domain, and it goes live in weeks rather than quarters, because the engine is already built.
 
-If it is not a priority this year, say so and I will leave it there. If it is, the fastest first step is a collection name.
+If it is not a priority this year, say so and I will leave it there. If it is, we will arrive with {co} products already loaded and walk through a shopper's journey start to finish: {DEMO}"""
+    return s1, b1, pick(S2['A'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3
 
-{url}"""
-    return s1, b1, s2, b2, s3, b3
-
-def variant_B(f, co, dom, tool, hook, thread, partner, basic, url):
+def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab):
     """No design step, or filters only. Open on what they promise, never on
     what they lack: qualifier 1 records NONE as none found, not none exists."""
     if hook:
@@ -446,91 +444,84 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url):
     else:
         line = f'{dom} presents the collections well, and the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = f'the visitors {dom} cannot name'
+        s1 = pick(S1['BA'], f + co, 1).format(dom=dom)
         b1 = f"""Hello {f},
 
 {line}
 
-So a visitor forms an opinion and leaves, and you never learn who they were or which products held their attention.
+What it cannot do is show somebody your product in the room they are standing in. So they browse, form an opinion and leave, and you never learn who they were.
 
-We change what the website does with that traffic. The visitor designs a room from your own collections, and you receive the render, the product list and their contact details as a single lead record.
+Showhouse does that on your own site. They photograph the room, your product appears in it without touching anything else in the picture, and the image unlocks once they verify an email.
 
-Our work in your category: {url}
+Render a photo of your own room here: {url}
 
-Shall I put a {co} collection into one so you can try it?"""
-        s2 = 'renders made only from what you actually sell'
+Shall I have {co} products loaded before we speak?"""
         b2 = f"""Hello {f},
 
-The detail that decides whether this is worth your time: it runs on your catalogue, not a generic material library.
+Anyone can put a render button on a website. What pays for it is everything after the image.
 
-We load your collections, formats and finishes, so anything a visitor produces is a specification your team can quote and ship.
+A guided finder asks the shopper about style, colour and space, and their answers become a written brief. It renders only inside your catalogue and your size rules, so every result is something you can quote and ship.
 
-That is what makes the lead worth having. Your salesperson opens it already knowing the products, the room and the person.
+Your salesperson opens one record: the render, the brief, the products, and a verified address.
 
 {url}
 
-Send me one collection name and I will build it into a working version for you."""
-        s3 = 'seven weeks from brief to live'
+We can load {co} products and walk you through a shopper's journey end to end: {DEMO}"""
         b3 = f"""Hello {f},
 
 The last thing worth knowing is the timeline.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with a team of three. It is live and in daily use. That is the realistic schedule for a branded version on {dom}, not a twelve month platform project.
+The engine is built, so most of the work is catalogue preparation and branding. It goes live in weeks under your own logo and domain, on {dom}, not in quarters.
 
-If this sits with a colleague rather than with you, tell me who and I will approach them instead.
+The Mosaic Studio on the site is the original build, running for MEC Artworks today.
 
-{url}"""
+If this sits with a colleague rather than with you, tell me who and I will approach them instead: {DEMO}"""
     else:
-        s1 = 'the page people stay on'
+        s1 = pick(S1['BB'], f + co, 1).format(dom=dom)
         b1 = f"""Hello {f},
 
 A note about {dom} rather than a pitch.
 
-A catalogue website is browsed and left. An interactive tool changes that: visitors stay longer, they have a reason to return, and the page becomes something other sites link to.
+A catalogue website is browsed and left. Showhouse lets a visitor photograph their own room and see your product in it, so the page stops being a brochure and becomes the thing they show their partner.
 
-Underneath it you get the commercial part. Every design produced arrives as a lead, with the products chosen and the contact details attached.
+Underneath it sits the commercial part. Every image unlocks against a verified email, so each render reaches you as a lead with a written brief on it.
 
-Daltile and Marazzi both went this way. In your market it is still open.
+The studio is open, no sign in needed: {url}
 
-{url}"""
-        s2 = 'what lands in your dashboard'
+Worth a look?"""
         b2 = (f"""Hello {f},
 
-To be concrete about the output, since the value sits in what your team receives.
+To be concrete about the output, since that is where the value sits.
 
-A visitor finishes a design. You get one record: the rendered room, the products and formats used, and their name and email address. Your team then calls somebody who has already chosen.
+A shopper answers a few questions about style, colour and space, renders their own room, then verifies an email to keep the image. You receive one record: the render, the brief in their own words, the products, and an address that is real.
 
 I wrote to {partner} as well, since I could not tell from outside which of you owns the website.
 
+{url}"""
+              if partner else f"""Hello {f},
+
+To be concrete about the output, since that is where the value sits.
+
+A shopper answers a few questions about style, colour and space, renders their own room, then verifies an email to keep the image. You receive one record: the render, the brief in their own words, the products, and an address that is real.
+
 {url}
 
-Name one collection and I will build it into a version for you.""" if partner else f"""Hello {f},
-
-To be concrete about the output, since the value sits in what your team receives.
-
-A visitor finishes a design. You get one record: the rendered room, the products and formats used, and their name and email address. Your team then calls somebody who has already chosen.
-
-{url}
-
-Name one collection and I will build it into a version for you.""")
-        s3 = 'seven weeks, and then it is yours'
+Worth twenty minutes with your own catalogue in it?""")
         b3 = f"""Hello {f},
 
 Closing this out.
 
-We built this for MEC Artworks, a mosaic manufacturer, in seven weeks with three people, and it runs on their site today. A branded version for {co}, on your own catalogue and your own domain, is the same order of work.
+It runs under your brand on your own domain, and it goes live in weeks rather than quarters, because the engine is built and the work is catalogue preparation.
 
-If it is not a priority this year, say so and I will leave it there. If it is, the fastest first step is a collection name.
-
-{url}"""
-    return s1, b1, s2, b2, s3, b3
+If it is not a priority this year, say so and I will leave it there. If it is, we will arrive with {co} products already loaded and walk through a shopper's journey start to finish: {DEMO}"""
+    return s1, b1, pick(S2['B'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3
 
 # ─────────────────────────────── build ───────────────────────────────
 rows = list(csv.DictReader(open(SRC, encoding='utf-8-sig')))
 COLS = ['email','first_name','last_name','company_name','website','contact_thread',
         'segment_variant','send_day_1','send_day_2','send_day_3',
         'msg_subject_1','msg_body_1','msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
-        'studio_url',
+        'studio_url','qa_send_flag',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
 DAYS = {'A': ('1','6','13'), 'B': ('3','9','16')}
@@ -547,7 +538,8 @@ for r in rows:
     hook = best_quote(ev)
     seg = 'C' if tryon == 'yes' else ('A' if lvl == 'MANUAL' else 'B')
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
-    url = BASE + STUDIO.get(sk, '')
+    path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
+    url = BASE + path
 
     people = []
     for col, nmcol, thread in (('Work Email (2)','Full Name p1','A'), ('Work Email','Full Name p2','B')):
@@ -573,22 +565,16 @@ for r in rows:
         partner_email = next((e for e, _, th in people if th == other), '')
 
         if seg == 'C':
-            s1,b1,s2,b2,s3,b3 = variant_C(first, co, dom, tool, hook, thread, partner, url)
+            s1,b1,s2,b2,s3,b3 = variant_C(first, co, dom, tool, hook, thread, partner, url, lab)
         elif seg == 'A':
-            s1,b1,s2,b2,s3,b3 = variant_A(first, co, dom, tool, hook, thread, partner, url)
+            s1,b1,s2,b2,s3,b3 = variant_A(first, co, dom, tool, hook, thread, partner, url, lab)
         else:
-            s1,b1,s2,b2,s3,b3 = variant_B(first, co, dom, tool, hook, thread, partner, lvl == 'BASIC', url)
+            s1,b1,s2,b2,s3,b3 = variant_B(first, co, dom, tool, hook, thread, partner, lvl == 'BASIC', url, lab)
 
         if seg == 'C':
             hq = 'strong' if tool else 'weak'
         else:
             hq = 'strong' if hook else 'weak'
-
-        # Subject rotation is applied after generation so every variant gets it
-        # from one place. Message 1 already varies by company, tool name or
-        # domain, so only the follow-ups need a bank.
-        s2 = pick(S2[seg + thread], email, 2)
-        s3 = pick(S3[thread], email, 3)
 
         d = DAYS[thread]
         out.append(dict(email=email, first_name=first, last_name=last, company_name=co,
@@ -597,6 +583,13 @@ for r in rows:
             msg_subject_1=s1, msg_body_1=b1, msg_subject_2=s2, msg_body_2=b2,
             msg_subject_3=s3, msg_body_3=b3,
             studio_url=url,
+            # No studio means Showhouse has no page for what they sell: taps,
+            # sanitaryware, doors, radiators, bathroom furniture. The link
+            # still resolves, to the homepage, but the pitch does not. This is
+            # a QUALIFICATION result, not a copy problem, and it is the single
+            # most useful filter in the file: hold these until someone decides
+            # whether a company that sells no installed surface belongs here.
+            qa_send_flag=('send' if sk else 'HOLD no studio'),
             qa_tool_level=lvl, qa_has_tryon=tryon, qa_tool_name=tool, qa_studio=sk,
             qa_hook_quality=hq, qa_hook=hook, qa_partner_email=partner_email,
             qa_country=clean(r['country']), qa_size=clean(r['Size']), qa_evidence=ev))
