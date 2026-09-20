@@ -233,11 +233,29 @@ def studio_key(cat, niche, desc):
 # "specification" to "spec". Sentences are shorter and more of them start
 # with you.
 
+# ─── follow-ups rebuilt 20 Sept ──────────────────────────────────────
+# Message 1 is approved and unchanged. Messages 2 and 3 were both still
+# EXPLAINING the product at different lengths, which is why they read flat.
+# Each one is now a different move rather than another paragraph of pitch.
+#
+#   Message 2, thread A: SHOW a lead instead of describing one. The shape of
+#     the record is straight off the Showhouse page, so it is real rather than
+#     imagined, and a short list scans in two seconds where a paragraph does
+#     not. Nothing about it sounds like a pitch.
+#   Message 2, thread B: hand over a piece of market news they can use whether
+#     or not they reply. Daltile, Marazzi and white-labelled Roomvo are all
+#     verified. This is also where the colleague handoff sits.
+#   Message 3: say the thing they are already thinking and have not written
+#     back to say. The objection differs by segment, so each gets its own, and
+#     every one ends with an easy no. Thread B gets the two-line version: one
+#     real question, no pitch at all.
+#
+# Casual register throughout, contractions included. No dashes, no filtered
+# words, no signature block.
+
 def pick(bank, email, salt):
     """Near-identical phrasing across a segment was copy defect four on
-    campaign 2, and it creeps back wherever one argument serves 200 rows.
-    Keyed on the address so the choice is stable across rebuilds, and the two
-    people at one company still land on different lines."""
+    campaign 2, and it creeps back wherever one argument serves 200 rows."""
     return bank[(hash((email, salt)) & 0x7fffffff) % len(bank)]
 
 DEMO = 'https://www.tryshowhouse.com/#book'
@@ -253,77 +271,117 @@ S1 = {
         'what a visitor leaves behind'],
 }
 S2 = {
- 'CA': ['a visualiser is the hook, the pipeline is the product',
-        'what comes after the picture',
-        'the brief writes itself',
-        'a real email, not a form fill'],
- 'AA': ['the brief your client writes, not your team',
-        'what comes after the picture',
-        'from a room photo to a proper spec',
-        'a real email, not a form fill'],
- 'BA': ['a visualiser is the hook, the pipeline is the product',
-        'what comes after the picture',
-        'the brief writes itself',
-        'a real email, not a form fill'],
- 'CB': ['which finishes people go for, and which nobody touches',
-        'every render, every drop off',
-        "the part your visualiser doesn't keep",
-        'what the numbers would tell you'],
- 'AB': ['the enquiry that turns up already spelled out',
-        'every render, every drop off',
-        'what your team stops having to draw',
-        'what the numbers would tell you'],
- 'BB': ['which finishes people go for, and which nobody touches',
-        'every render, every drop off',
-        "what's behind each picture",
-        'what the numbers would tell you'],
+ 'A': ['what one of these looks like when it lands',
+       'easier to show than explain',
+       'their room, their words, their email',
+       'this is what turns up on your side'],
+ 'B': ['Daltile has one, Marazzi has one',
+       'the one nobody can tell was bought in',
+       'worth knowing either way',
+       "what everyone else is quietly running"],
 }
 S3 = {
- 'A': ['live in weeks, not quarters',
-       'your catalogue, already loaded',
-       'last thing, on timing',
-       'what the build actually looks like'],
- 'B': ['your catalogue, already loaded',
-       'live in weeks, not quarters',
-       'wrapping this up',
-       'one straight question and then I stop'],
+ 'CA': ["why bother, you've already got one",
+        'the fair question',
+        'judge it yourself rather than take my word'],
+ 'AA': ['nobody wants a machine in the middle',
+        'the bit people push back on',
+        'you still get the conversation'],
+ 'BA': ['the renders will look fake, right',
+        "the bit people don't say out loud",
+        'judge it yourself rather than take my word'],
+ 'CB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
+ 'AB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
+ 'BB': ["two lines and I'll stop", 'one question', 'what do you know tomorrow morning'],
 }
 
-# Shared closers. Message 2 thread B and message 3 thread B make the same
-# point in every segment, so they live in one place rather than three.
+# The record itself, written the way Showhouse writes it on its own page, so
+# this is the real shape rather than an invented one. A short list scans in two
+# seconds where a paragraph does not.
+LEAD_RECORD = """a photo of their actual room with your product in it
+their own words, something like "large format warm travertine, wide plank, matte"
+the spec: herringbone, Carrara and cream, polished, 600x300
+and an email address they've confirmed"""
+
+def _a2(f, co, url, seg):
+    """Show the lead, do not describe it.
+
+    Framed differently per segment, because otherwise one body went out to 300
+    addresses with only the company name changing, which is campaign 2's copy
+    defect four wearing a new coat. The move is the same in all three; the
+    sentence around it is not."""
+    if seg == 'C':
+        top = ("You already know what a render looks like, so here's the only part that's new.\n\n"
+               "When somebody finishes, this is what turns up on your side:")
+        bottom = ("Your current one gives them the picture. This one gives you the rest of it too.")
+    elif seg == 'A':
+        top = ("Easier to show you than explain it.\n\n"
+               "Instead of the email you'd normally get, this is what turns up:")
+        bottom = ("Nobody typed out a description and nobody had to interpret one. "
+                  "They'd already settled the room, the look and the size before your team said a word.")
+    elif (hash((f, co)) & 1):
+        top = ("Easier to show you than explain it.\n\n"
+               "When somebody finishes, this is what turns up on your side:")
+        bottom = ("Nobody filled in a contact form. They'd told you the room, the look "
+                  "and the size before anyone picked up the phone.")
+    else:
+        # Second framing for the largest cohort. Same move, different sentence,
+        # so 139 addresses stop receiving one body with the name swapped.
+        top = ("Rather than describe it, here's a lead as it actually arrives.\n\n"
+               "One record, four things in it:")
+        bottom = ("That's someone who has already decided, sitting in your inbox with "
+                  "a picture of the room attached. Not a name on a mailing list.")
+    return f"""Hello {f},
+
+{top}
+
+{LEAD_RECORD}
+
+{bottom}
+
+{url}
+
+Want me to put {co} products in one so you can see yours?"""
+
 def _b2(f, url, partner):
-    if partner:
+    """Market news they can use either way, plus the colleague handoff."""
+    tail = (f"\n\nI sent this to {partner} too, since I couldn't tell from outside whose call it is."
+            if partner else '')
+    return f"""Hello {f},
+
+Not a pitch, just something worth knowing.
+
+Daltile has one of these. Marazzi has one. And plenty of brands you'd recognise are running Roomvo, which is white labelled, so it sits there under their own name and nobody can tell it was bought in.
+
+The difference with ours is what happens to the visitor afterwards. They confirm an email to keep the picture, so you end up with the person rather than a page view.{tail}
+
+{url}"""
+
+def _b3(f, dom, url, co):
+    """Two lines, one real question, no pitch. Two of them, split by row, so
+    139 addresses do not receive the same body."""
+    if (hash((f, co)) & 1):
         return f"""Hello {f},
 
-Here's what actually reaches you.
+Two lines and then I'll stop.
 
-Someone answers a few quick questions about style, colour and space, renders their room, then confirms their email to keep the picture. You get one record: the image, what they asked for in their own words, the products, and a real address.
+If somebody lands on {dom} tonight and falls for one of your collections, what do you actually know about them tomorrow morning?
 
-I sent this to {partner} too, since I couldn't tell from outside whose call it is.
+If the answer is nothing, that's the whole reason I wrote.
 
 {url}"""
     return f"""Hello {f},
 
-Here's what actually reaches you.
+Last one, and it's a genuine question rather than a pitch.
 
-Someone answers a few quick questions about style, colour and space, renders their room, then confirms their email to keep the picture. You get one record: the image, what they asked for in their own words, the products, and a real address.
+Out of everyone who looked at {dom} last month, how many did you get a name for?
 
-{url}
+Whatever that number is, the rest of them liked something enough to look. You just never found out who.
 
-Worth twenty minutes with your own products in it?"""
-
-def _b3(f, co):
-    return f"""Hello {f},
-
-Wrapping this up.
-
-It runs under your own name on your own site, and it's live in weeks rather than quarters, because the engine is built and the work is loading your catalogue.
-
-If it's not something for this year, tell me and I'll leave it there. If it is, we'll turn up with {co} products already in it and walk you through what a shopper sees: {DEMO}"""
+{url}"""
 
 def variant_C(f, co, dom, tool, hook, thread, partner, url, lab):
-    """Already runs a visualiser. Never suggest they lack one. Theirs is the
-    hook; what they haven't got is the pipeline behind it."""
+    """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
         s1 = f'{t} shows the room, and then what'
@@ -338,26 +396,18 @@ Showhouse does the same thing under your own name, except the picture only unloc
 Have a go on a photo of your own room: {url}
 
 Want me to load some {co} products in first?"""
-        b2 = f"""Hello {f},
-
-A render button is easy. The useful part is what comes after the picture.
-
-Before they see it, a few quick questions ask what style, colour and space they're working with. Those answers turn into a short brief. Then they confirm their email to keep the image, so the address you get is a real one.
-
-Your salesperson opens one thing and sees the room, the brief, the products and a person to call.
-
-{url}
-
-Happy to put {co} products in and show you the whole journey: {DEMO}"""
+        b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
 
-Last thing, in case timing is what you're weighing up.
+I'll leave it here after this.
 
-The engine already exists. What takes time is getting your catalogue in and making it look like you. That's weeks, not quarters.
+You've already got the render part, so the fair question is why bother at all.
 
-The Mosaic Studio on the site is the first one we built. It has been running for MEC Artworks ever since.
+It's only the bit afterwards. Yours shows the picture and the visitor goes. Ours holds the picture back until they've confirmed an email, so you end up with a person to ring instead of a number in your analytics.
 
-If it would help to see it with {co} products in it, I can set that up: {DEMO}"""
+Have a look and judge it yourself: {url}
+
+And if it's a no, just say no. I'll leave you be."""
     else:
         s1 = "the part a visualiser doesn't keep"
         b1 = f"""Hello {f},
@@ -372,8 +422,8 @@ The studio is open, nothing to sign into: {url}
 
 Worth a look?"""
         b2 = _b2(f, url, partner)
-        b3 = _b3(f, co)
-    return (s1, b1, pick(S2['C'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3)
+        b3 = _b3(f, dom, url, co)
+    return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['C'+thread], f+co, 3), b3)
 
 def variant_A(f, co, dom, tool, hook, thread, partner, url, lab):
     """A person does the visualising today and a sample usually follows."""
@@ -392,26 +442,18 @@ Showhouse puts that step on your website instead. They photograph their own room
 Try it on a photo of your own room: {url}
 
 Want me to load some {co} products in first?"""
-        b2 = f"""Hello {f},
-
-The point is what your team stops doing.
-
-A few questions about style, colour and space turn into a written brief. It only renders what is in your catalogue, your finishes and your sizes, so nothing comes back that you cannot actually make.
-
-The enquiry lands already spelled out, with a confirmed email on it, instead of a description somebody has to decode.
-
-{url}
-
-Happy to load {co} products and take you through it: {DEMO}"""
+        b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
 
-Last thing, on timing.
+Last one from me.
 
-The engine is already built. What takes time is getting your catalogue in and making it look like yours. Weeks, not quarters.
+The thing people usually push back on is that they don't want a machine sitting between them and the client. Which is fair, that conversation is the job.
 
-The Mosaic Studio on the site was the first one. It has been running for MEC Artworks since.
+This isn't that. It just means the client turns up having already seen something, so you start at "can we do that in this glaze" instead of "what do you make".
 
-If this belongs with somebody else, tell me who and I will go to them instead: {DEMO}"""
+Have a look and see what you think: {url}
+
+If it's a no, say so and I'll leave you alone."""
     else:
         s1 = 'the visitors who never get in touch'
         b1 = f"""Hello {f},
@@ -426,8 +468,8 @@ The studio is open, nothing to sign into: {url}
 
 Worth a look?"""
         b2 = _b2(f, url, partner)
-        b3 = _b3(f, co)
-    return (s1, b1, pick(S2['A'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3)
+        b3 = _b3(f, dom, url, co)
+    return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['A'+thread], f+co, 3), b3)
 
 def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab):
     """No design step, or filters only. Open on what they promise, never on
@@ -451,26 +493,33 @@ Showhouse does that on your own site. They take a photo of the room, your produc
 Try it on a photo of your own room: {url}
 
 Want me to load some {co} products in first?"""
-        b2 = f"""Hello {f},
+        b2 = _a2(f, co, url, 'B')
+        # Two objections, split by row. One body was going to 139 addresses,
+        # which is the phrasing pattern that sank campaign 2.
+        if (hash((f, co)) & 1):
+            b3 = f"""Hello {f},
 
-A render button is easy. The useful part is what comes after the picture.
+Last one from me, and it's the bit people don't usually write back to say.
 
-A few questions about style, colour and space turn into a short brief. It only renders what is in your catalogue and your sizes, so everything that comes back is something you can quote and ship.
+The worry is normally one of two things. Either the renders come out looking fake, or your products are too particular for something like this to get right.
 
-Your salesperson opens one thing: the image, the brief, the products, and a confirmed email.
+Both fair. It's why it only ever renders what's actually in your catalogue, your finishes and your sizes, and why the studio is sitting there open so you can judge it rather than take my word for it.
 
 {url}
 
-Happy to load {co} products and show you the whole journey: {DEMO}"""
-        b3 = f"""Hello {f},
+If it's a no, just say no and I'll leave you be."""
+        else:
+            b3 = f"""Hello {f},
 
-Last thing, on timing.
+Last one from me.
 
-The engine is already built. What takes time is getting your catalogue in and making it look like yours, on {dom}. Weeks, not quarters.
+The usual reason this goes nowhere isn't that people dislike the idea. It's that it sounds like a project, and nobody has a spare quarter to give it.
 
-The Mosaic Studio on the site was the first one. It has been running for MEC Artworks since.
+It isn't one. We do the catalogue work, it goes up under your name, and your side of it is mostly telling us which collections matter.
 
-If this belongs with somebody else, tell me who and I will go to them instead: {DEMO}"""
+Have a look at the studio first and see if it's even worth the conversation: {url}
+
+And if it isn't, tell me and I'll stop."""
     else:
         s1 = pick(S1['BB'], f + co, 1).format(dom=dom)
         b1 = f"""Hello {f},
@@ -485,8 +534,8 @@ The studio is open, nothing to sign into: {url}
 
 Worth a look?"""
         b2 = _b2(f, url, partner)
-        b3 = _b3(f, co)
-    return (s1, b1, pick(S2['B'+thread], f+co, 2), b2, pick(S3[thread], f+co, 3), b3)
+        b3 = _b3(f, dom, url, co)
+    return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['B'+thread], f+co, 3), b3)
 
 # ─────────────────────────────── build ───────────────────────────────
 rows = list(csv.DictReader(open(SRC, encoding='utf-8-sig')))
