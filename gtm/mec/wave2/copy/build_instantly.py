@@ -727,6 +727,26 @@ COLS = ['email','first_name','last_name','company_name','website','contact_threa
         'qa_partner_email','qa_country','qa_size','qa_evidence']
 DAYS = {'A': ('1','6','13'), 'B': ('3','9','16')}
 
+# ── A/B arm assignment, stratified by segment ────────────────────────
+# A plain coin flip per company left segment C at 33 revenue against 41 cost
+# and segment A at 17 against 12. That is ordinary random noise, but it breaks
+# the test: if one segment replies better than the others and happens to be
+# over-represented in an arm, that arm wins for a reason that has nothing to do
+# with the copy. So companies are bucketed by segment, ordered inside the
+# bucket by a stable hash, and dealt alternately. Each segment then splits as
+# close to even as its own row count allows, and the assignment still survives
+# a rebuild because the ordering key is CRC32 rather than hash().
+_by_seg = {}
+for r in rows:
+    tryon = clean(r['Use AI Has Tryon']).lower()
+    lvl_  = clean(r['Use AI Tool Level'])
+    seg_  = 'C' if tryon == 'yes' else ('A' if lvl_ == 'MANUAL' else 'B')
+    _by_seg.setdefault(seg_, set()).add(clean(r['company']))
+ARM = {}
+for seg_, names in _by_seg.items():
+    for i, name in enumerate(sorted(names, key=lambda n: stable('arm', seg_, n))):
+        ARM[name] = 'R' if i % 2 == 0 else 'C'
+
 out, seen = [], set()
 for r in rows:
     co_raw = clean(r['company'])
@@ -740,7 +760,7 @@ for r in rows:
     seg = 'C' if tryon == 'yes' else ('A' if lvl == 'MANUAL' else 'B')
     # A/B arm for message 1, assigned per COMPANY rather than per contact, so
     # the two people at a two-person company never receive different pitches.
-    variant = 'R' if (stable('arm', co_raw) & 1) else 'C'
+    variant = ARM[co_raw]
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
     path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
     url = BASE + path
