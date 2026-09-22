@@ -438,22 +438,87 @@ Whatever that number is, the rest of them liked something enough to look. You ju
 
 {url}"""
 
-def variant_C(f, co, dom, tool, hook, thread, partner, url, lab):
+# ─────────────────────── message 1, rebuilt 22 Sept ───────────────────
+# Two bodies, run as a live A/B, split BY COMPANY so both people at a two
+# person company land in the same arm and never see two different pitches.
+#
+#   Variant R, revenue side. The visitor you never meet. You already pay for
+#     that traffic; this turns the anonymous ones into named leads.
+#   Variant C, cost side. The sample you post to someone who was never going
+#     to order. This puts the decision in front of the sample.
+#
+# Both carry every element the feedback asked for: the room photo mode AND
+# Imagine from Scratch, the lead record (render, brief, verified email), the
+# dashboard, the catalogue load, white label on their own domain, and live in
+# weeks. 150 to 180 words, which is the ceiling before a cold reader skims.
+#
+# The opening paragraph is segment aware and the rest is variant aware, so
+# there are six openings over two bodies rather than one message for everyone.
+#
+# NOTE ON DATA. There are no published performance figures for Showhouse and
+# the MEC case study carries none, so none are claimed. The numbers in these
+# emails are the READER'S own: what a sample costs them to make and post, and
+# what their own traffic is worth. Asking a manufacturer to price their own
+# sample is not a claim, and it is more persuasive than a statistic they have
+# no reason to believe. Replace this the day Abdullah gets one real figure.
+
+SENDER = 'Haroon\nShowhouse'      # plain text, no block, no logo, per 22 Sept call
+
+def hook1(seg, co, dom, tool, hook, basic):
+    """First two lines. Segment aware, because the reason they are losing the
+    visitor is different in each one and that is the whole personalisation."""
+    if seg == 'C':
+        t = tool or 'your room visualiser'
+        return (f"You already run {t}, so someone can see your products in a room. "
+                f"Most of this category still can't do that.\n\n"
+                f"What it doesn't do is tell you who they were. They render, they like it, "
+                f"and they leave with no name attached.")
+    if seg == 'A':
+        first = f'On your own site: "{hook}".' if hook else \
+                f'{co} sells bespoke work, and the way in is to contact your team.'
+        return (f"{first}\n\nEvery one of those arrives as words, and someone on your side "
+                f"has to turn it into a picture before anything moves.")
+    first = (f'On your own site: "{hook}".' if hook else
+             f'{dom} lets people filter and browse, which helps them find a product.' if basic
+             else f'{dom} shows the collections well, and then the visit ends at a catalogue.')
+    return (f"{first}\n\nWhat it can't do is show someone your product in the room "
+            f"they're standing in. So they look, decide, and go.")
+
+def msg1(variant, seg, f, co, dom, tool, hook, basic, url):
+    top = hook1(seg, co, dom, tool, hook, basic)
+    if variant == 'R':
+        middle = (f"Showhouse sits on {dom} under your own branding, so nobody sees our name. "
+                  f"A visitor photographs their room and your product appears in it. Or they "
+                  f"describe what they're imagining and it's generated from your real "
+                  f"collections and finishes.\n\n"
+                  f"The image only unlocks once they confirm their email. So you get a lead: "
+                  f"the render, a short brief in their own words, and a verified address, all "
+                  f"in one dashboard.\n\n"
+                  f"Visitors also stay on the page instead of bouncing, and every render "
+                  f"builds visual content around your own products.\n\n"
+                  f"We load your actual catalogue first, so nothing renders that you can't "
+                  f"make. It goes live in weeks.")
+        cta = f"Try it on a photo of your own room: {url}\n\nWant one with {co} products in it? Send me a collection name."
+    else:
+        middle = (f"Every sample you post costs you something, and most of them go to people "
+                  f"who were never going to order.\n\n"
+                  f"Showhouse puts the decision before the sample. On {dom}, under your own "
+                  f"branding, a visitor photographs their room and sees your product in it, or "
+                  f"describes what they want and gets it generated from your real collections.\n\n"
+                  f"They confirm an email to keep the image. You get the render, a brief in "
+                  f"their words and a verified address in one dashboard, so you know who's "
+                  f"serious before anything ships.\n\n"
+                  f"Your own catalogue goes in first, so nothing renders that you don't make. "
+                  f"Live in weeks.")
+        cta = f"Have a go on your own room photo: {url}\n\nWant one loaded with {co} products? Just name a collection."
+    return f"Hello {f},\n\n{top}\n\n{middle}\n\n{cta}\n\n{SENDER}"
+
+def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant):
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
         s1 = subject1('CA', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-You already run {t}, so someone can see your products in their own room. Most brands still can't do that.
-
-The bit that's missing is what happens next. They render a room, like it, and leave. You never find out who they were.
-
-Showhouse does the same thing under your own name, except the picture only unlocks once they confirm their email. So the render reaches you, with what they asked for attached.
-
-Have a go on a photo of your own room: {url}
-
-Want me to load some {co} products in first?"""
+        b1 = msg1(variant, 'C', f, co, dom, tool, hook, False, url)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
 
@@ -466,38 +531,18 @@ Have a look and judge it yourself: {url}
 And if it's a no, just say no. I'll leave you be."""
     else:
         s1 = subject1('CB', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-Quick thought about {dom} rather than a pitch.
-
-People can already preview your products in a room. What you don't get back is any record of what they tried.
-
-Showhouse keeps all of it. Every render and every drop off, so you can see which finishes people go for and which ones nobody touches. Each one comes with a confirmed email.
-
-The studio is open, nothing to sign into: {url}
-
-Worth a look?"""
+        b1 = msg1(variant, 'C', f, co, dom, tool, hook, False, url)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['C'+thread], f+co, 3), b3)
 
-def variant_A(f, co, dom, tool, hook, thread, partner, url, lab):
+def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant):
     """A person does the visualising today and a sample usually follows."""
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
         s1 = subject1('AA', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-{line}
-
-Every one of those comes in as words, and then somebody on your side has to turn it into a picture. A sample goes in the post and a week disappears.
-
-Showhouse puts that step on your website instead. They photograph their own room, your product shows up in it, and it reaches you with the picture and a short brief already attached.
-
-Try it on a photo of your own room: {url}
-
-Want me to load some {co} products in first?"""
+        b1 = msg1(variant, 'A', f, co, dom, tool, hook, False, url)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
 
@@ -510,22 +555,12 @@ Have a look and see what you think: {url}
 If it's a no, say so and I'll leave you alone."""
     else:
         s1 = subject1('AB', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-{line}
-
-Most people won't. Not because they aren't interested, but because they can't picture what they would even be asking for. So they leave, and you never know they were there.
-
-Showhouse changes what your site does with them. They photograph the room, your product appears in it, and the picture unlocks when they confirm their email.
-
-The studio is open, nothing to sign into: {url}
-
-Worth a look?"""
+        b1 = msg1(variant, 'A', f, co, dom, tool, hook, False, url)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['A'+thread], f+co, 3), b3)
 
-def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab):
+def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant):
     """No design step, or filters only. Open on what they promise, never on
     what they lack: qualifier 1 records NONE as none found, not none exists."""
     if hook:
@@ -536,17 +571,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab):
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
         s1 = subject1('BA', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-{line}
-
-What it can't do is show somebody your product in the room they are standing in. So they look, make their mind up and go, and you never find out who they were.
-
-Showhouse does that on your own site. They take a photo of the room, your product appears in it and nothing else in the picture moves, and the image unlocks when they confirm their email.
-
-Try it on a photo of your own room: {url}
-
-Want me to load some {co} products in first?"""
+        b1 = msg1(variant, 'B', f, co, dom, tool, hook, basic, url)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
         # which is the phrasing pattern that sank campaign 2.
@@ -574,17 +599,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 And if it isn't, tell me and I'll stop."""
     else:
         s1 = subject1('BB', f, co, dom, tool)
-        b1 = f"""Hello {f},
-
-Quick thought about {dom} rather than a pitch.
-
-A catalogue gets looked at and closed. Showhouse lets somebody photograph their own room and see your product in it, which turns the page into the thing they show their partner.
-
-Underneath that sits the part that pays. Every picture unlocks against a confirmed email, so each one reaches you as a lead with a short brief on it.
-
-The studio is open, nothing to sign into: {url}
-
-Worth a look?"""
+        b1 = msg1(variant, 'B', f, co, dom, tool, hook, basic, url)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['B'+thread], f+co, 3), b3)
@@ -594,7 +609,7 @@ rows = list(csv.DictReader(open(SRC, encoding='utf-8-sig')))
 COLS = ['email','first_name','last_name','company_name','website','contact_thread',
         'segment_variant','send_day_1','send_day_2','send_day_3',
         'msg_subject_1','msg_body_1','msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
-        'studio_url','qa_send_flag',
+        'studio_url','ab_arm','qa_send_flag',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
 DAYS = {'A': ('1','6','13'), 'B': ('3','9','16')}
@@ -610,6 +625,9 @@ for r in rows:
     tool = tool_name(ev, r['Use AI Tool Url'])
     hook = best_quote(ev)
     seg = 'C' if tryon == 'yes' else ('A' if lvl == 'MANUAL' else 'B')
+    # A/B arm for message 1, assigned per COMPANY rather than per contact, so
+    # the two people at a two-person company never receive different pitches.
+    variant = 'R' if (hash(('arm', co_raw)) & 1) else 'C'
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
     path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
     url = BASE + path
@@ -638,11 +656,11 @@ for r in rows:
         partner_email = next((e for e, _, th in people if th == other), '')
 
         if seg == 'C':
-            s1,b1,s2,b2,s3,b3 = variant_C(first, co, dom, tool, hook, thread, partner, url, lab)
+            s1,b1,s2,b2,s3,b3 = variant_C(first, co, dom, tool, hook, thread, partner, url, lab, variant)
         elif seg == 'A':
-            s1,b1,s2,b2,s3,b3 = variant_A(first, co, dom, tool, hook, thread, partner, url, lab)
+            s1,b1,s2,b2,s3,b3 = variant_A(first, co, dom, tool, hook, thread, partner, url, lab, variant)
         else:
-            s1,b1,s2,b2,s3,b3 = variant_B(first, co, dom, tool, hook, thread, partner, lvl == 'BASIC', url, lab)
+            s1,b1,s2,b2,s3,b3 = variant_B(first, co, dom, tool, hook, thread, partner, lvl == 'BASIC', url, lab, variant)
 
         if seg == 'C':
             hq = 'strong' if tool else 'weak'
@@ -656,6 +674,7 @@ for r in rows:
             msg_subject_1=s1, msg_body_1=b1, msg_subject_2=s2, msg_body_2=b2,
             msg_subject_3=s3, msg_body_3=b3,
             studio_url=url,
+            ab_arm=('R revenue' if variant == 'R' else 'C cost'),
             # No studio means Showhouse has no page for what they sell: taps,
             # sanitaryware, doors, radiators, bathroom furniture. The link
             # still resolves, to the homepage, but the pitch does not. This is
