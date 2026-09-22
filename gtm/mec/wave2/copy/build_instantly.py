@@ -491,7 +491,9 @@ S1 = {
   'C': ["What {tool} doesn't tell you",
         "{tool} renders it, then they're gone",
         'After the render, who was it?',
-        '{tool}, and the name behind it'],
+        '{tool}, and the name behind it',
+        'Every render, and nobody to call',
+        "The part {dom} does not record"],
   'A': ['The enquiries {dom} never gets',
         'Interested, but never in touch',
         'Why most visitors never ask',
@@ -505,14 +507,17 @@ S1 = {
  'C': {
   'C': ['Who is serious, before you ship',
         '{tool}, and the samples that follow',
-        'The samples you would stop posting',
+        'The samples {dom} would stop posting',
+        'Samples, before or after {tool}',
         'Before the next sample goes out'],
   'A': ['Before the sample goes in the post',
         'The week you lose to a sample',
+        'Samples {dom} did not need to send',
         'Samples that were never going to land',
         'The cost of quoting from a description'],
   'B': ['The samples that never convert',
         'Before the sample goes in the post',
+        'Samples {dom} did not need to send',
         'Who is serious, before you ship',
         'The week between sample and answer'],
  },
@@ -534,10 +539,14 @@ def subject1(arm, seg, f, co, dom, tool, thread='A'):
     # the person's name instead left 18 of the 82 two-person companies with
     # both people on the same subject, which is what a four-option bank gives
     # you by chance. The offset makes a clash impossible rather than unlikely.
-    out = pick(bank, co, 1, 0 if thread == 'A' else 1).format(dom=dom, tool=t)
+    off = 0 if thread == 'A' else 1
+    out = pick(bank, co, 1, off).format(dom=dom, tool=t)
     if len(out) <= 50:
         return out
-    return min((b.format(dom=dom, tool=t) for b in bank), key=len)
+    # Falling back to the single shortest option put both people at a company
+    # on the same subject. Rank what fits and keep the thread offset.
+    fits = sorted((b.format(dom=dom, tool=t) for b in bank), key=len)
+    return fits[off % len(fits)]
 
 def hook1(seg, co, dom, tool, hook, basic):
     """The opening two lines. Segment aware, because the reason they are
@@ -721,7 +730,8 @@ And if it isn't, tell me and I'll stop."""
 rows = list(csv.DictReader(open(SRC, encoding='utf-8-sig')))
 COLS = ['email','first_name','last_name','company_name','website','contact_thread',
         'segment_variant','send_day_1','send_day_2','send_day_3',
-        'msg_subject_1','msg_body_1','msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
+        'msg_subject_1a','msg_body_1a','msg_subject_1b','msg_body_1b',
+        'msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
         'studio_url','ab_arm','qa_send_flag',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
@@ -788,12 +798,26 @@ for r in rows:
         partner = firsts.get(other, '')
         partner_email = next((e for e, _, th in people if th == other), '')
 
-        if seg == 'C':
-            s1,b1,s2,b2,s3,b3 = variant_C(first, co, dom, tool, hook, thread, partner, url, lab, variant)
-        elif seg == 'A':
-            s1,b1,s2,b2,s3,b3 = variant_A(first, co, dom, tool, hook, thread, partner, url, lab, variant)
-        else:
-            s1,b1,s2,b2,s3,b3 = variant_B(first, co, dom, tool, hook, thread, partner, lvl == 'BASIC', url, lab, variant)
+        # Both arms are generated for EVERY row and written to their own
+        # columns, so one Instantly campaign can hold both as step 1 variants
+        # and randomise between them natively. That beats two campaigns: same
+        # mailboxes, same schedule, same daily volume, so the only difference
+        # measured is the copy. Two campaigns can drift apart on send rate and
+        # then the result is unreadable.
+        #
+        # Only message 1 differs. The follow-ups are identical in both arms on
+        # purpose, because a test with two moving parts answers nothing.
+        gen = {'C': variant_C, 'A': variant_A}.get(seg)
+        both = {}
+        for arm in ('R', 'C'):
+            if gen:
+                both[arm] = gen(first, co, dom, tool, hook, thread, partner, url, lab, arm)
+            else:
+                both[arm] = variant_B(first, co, dom, tool, hook, thread, partner,
+                                      lvl == 'BASIC', url, lab, arm)
+        s1a, b1a = both['R'][0], both['R'][1]
+        s1b, b1b = both['C'][0], both['C'][1]
+        _, _, s2, b2, s3, b3 = both['R']
 
         if seg == 'C':
             hq = 'strong' if tool else 'weak'
@@ -804,9 +828,14 @@ for r in rows:
         out.append(dict(email=email, first_name=first, last_name=last, company_name=co,
             website=dom, contact_thread=thread, segment_variant=seg,
             send_day_1=d[0], send_day_2=d[1], send_day_3=d[2],
-            msg_subject_1=s1, msg_body_1=b1, msg_subject_2=s2, msg_body_2=b2,
-            msg_subject_3=s3, msg_body_3=b3,
+            msg_subject_1a=s1a, msg_body_1a=b1a,
+            msg_subject_1b=s1b, msg_body_1b=b1b,
+            msg_subject_2=s2, msg_body_2=b2, msg_subject_3=s3, msg_body_3=b3,
             studio_url=url,
+            # Kept as a balanced fallback. If Instantly randomises step 1 this
+            # column is ignored; if you would rather control the split by hand,
+            # filter on it, because it is stratified by segment and a random
+            # split is not.
             ab_arm=('R revenue' if variant == 'R' else 'C cost'),
             # No studio means Showhouse has no page for what they sell: taps,
             # sanitaryware, doors, radiators, bathroom furniture. The link
