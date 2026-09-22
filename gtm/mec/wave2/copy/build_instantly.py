@@ -481,7 +481,12 @@ Whatever that number is, the rest of them liked something enough to look. You ju
 # and it beats a statistic they have no reason to believe. Replace this the
 # day one real figure exists.
 
-SENDER = 'Haroon\nShowhouse'      # plain text, no block, no logo, per the 22 Sept call
+# Plain text, no block and no logo image, per the 22 Sept call: a blocked
+# remote image renders as a broken box and wrecks the image-to-text ratio.
+# The company is Triminage, not Showhouse. Showhouse is the product the email
+# is about, and signing as the product reads as if the brand is writing to
+# them rather than a person at the agency that built it.
+SENDER = 'Regards,\n\nHaroon\nTriminage'
 
 # Subject banks are keyed by ARM then SEGMENT. Keeping them arm-aware matters:
 # a cost-side subject over a revenue-side body would mean the A/B is measuring
@@ -581,7 +586,7 @@ def msg1(arm, thread, seg, f, co, dom, tool, hook, basic, url, partner):
                    f"the render, a short brief in their own words, and a verified address, all "
                    f"in one dashboard.\n\n"
                    f"Visitors also stay on the page instead of bouncing, and every render "
-                   f"builds visual content around your own products.\n\n"
+                   f"builds content around your own products.\n\n"
                    f"We load your actual catalogue first, so nothing renders that you can't "
                    f"make. It goes live in weeks.")
             cta = (f"Try it on a photo of your own room: {url}\n\n"
@@ -830,7 +835,8 @@ for r in rows:
             send_day_1=d[0], send_day_2=d[1], send_day_3=d[2],
             msg_subject_1a=s1a, msg_body_1a=b1a,
             msg_subject_1b=s1b, msg_body_1b=b1b,
-            msg_subject_2=s2, msg_body_2=b2, msg_subject_3=s3, msg_body_3=b3,
+            msg_subject_2=s2, msg_body_2=f'{b2}\n\n{SENDER}',
+            msg_subject_3=s3, msg_body_3=f'{b3}\n\n{SENDER}',
             studio_url=url,
             # Kept as a balanced fallback. If Instantly randomises step 1 this
             # column is ignored; if you would rather control the split by hand,
