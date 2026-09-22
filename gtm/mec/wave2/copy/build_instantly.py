@@ -23,7 +23,7 @@ stays grammatical across 390 different fragments. Where no usable quote exists
 the row falls back to a neutral line that is still true of that row, and
 qa_hook_quality is written as 'weak' so it can be found and hand-fixed.
 """
-import csv, re, unicodedata
+import csv, re, unicodedata, zlib
 
 SRC = '../q1/contacts_final.csv'
 OUT = 'MEC_Instantly_Wave2.csv'
@@ -253,10 +253,21 @@ def studio_key(cat, niche, desc):
 # Casual register throughout, contractions included. No dashes, no filtered
 # words, no signature block.
 
-def pick(bank, email, salt):
+def stable(*parts):
+    """CRC32, not the built-in hash().
+
+    Python randomises string hashing per process unless PYTHONHASHSEED is set,
+    so hash() reshuffled the A/B arms and every rotated subject line on each
+    rebuild. That silently invalidates a running test: a contact on the revenue
+    arm today could be on the cost arm after tomorrow's rebuild, and nothing in
+    the output would show it moved. CRC32 is deterministic across processes and
+    machines, so a rebuild reproduces the file byte for byte."""
+    return zlib.crc32('\x1f'.join(str(p) for p in parts).encode())
+
+def pick(bank, key, salt, offset=0):
     """Near-identical phrasing across a segment was copy defect four on
     campaign 2, and it creeps back wherever one argument serves 200 rows."""
-    return bank[(hash((email, salt)) & 0x7fffffff) % len(bank)]
+    return bank[(stable(key, salt) + offset) % len(bank)]
 
 DEMO = 'https://www.tryshowhouse.com/#book'
 
@@ -291,7 +302,7 @@ S1 = {
  'AA': ['Before the sample goes in the post',
         'The week you lose to a sample',
         'When the brief arrives as words',
-        'Quoting from a description'],
+        'The cost of quoting from a description'],
  'AB': ['The enquiries {dom} never gets',
         'Interested, but never in touch',
         'Why most visitors never ask',
@@ -379,7 +390,7 @@ def _a2(f, co, url, seg):
                "Instead of the email you'd normally get, this is what turns up:")
         bottom = ("Nobody typed out a description and nobody had to interpret one. "
                   "They'd already settled the room, the look and the size before your team said a word.")
-    elif (hash((f, co)) & 1):
+    elif (stable(f, co) & 1):
         top = ("Easier to show you than explain it.\n\n"
                "When somebody finishes, this is what turns up on your side:")
         bottom = ("Nobody filled in a contact form. They'd told you the room, the look "
@@ -420,7 +431,7 @@ The difference with ours is what happens to the visitor afterwards. They confirm
 def _b3(f, dom, url, co):
     """Two lines, one real question, no pitch. Two of them, split by row, so
     139 addresses do not receive the same body."""
-    if (hash((f, co)) & 1):
+    if (stable(f, co) & 1):
         return f"""Hello {f},
 
 If somebody lands on {dom} tonight and falls for one of your collections, what do you actually know about them tomorrow morning?
@@ -439,34 +450,99 @@ Whatever that number is, the rest of them liked something enough to look. You ju
 {url}"""
 
 # ─────────────────────── message 1, rebuilt 22 Sept ───────────────────
-# Two bodies, run as a live A/B, split BY COMPANY so both people at a two
-# person company land in the same arm and never see two different pitches.
+# Two bodies run as a live A/B, split BY COMPANY so both people at a two
+# person company land in the same arm and never receive two different pitches.
 #
-#   Variant R, revenue side. The visitor you never meet. You already pay for
-#     that traffic; this turns the anonymous ones into named leads.
-#   Variant C, cost side. The sample you post to someone who was never going
-#     to order. This puts the decision in front of the sample.
+#   Arm R, revenue side. The visitor you never meet. They already pay for that
+#     traffic, so this is about turning the anonymous ones into named leads.
+#   Arm C, cost side. The sample posted to somebody who was never going to
+#     order. This puts the decision in front of the sample.
 #
 # Both carry every element the feedback asked for: the room photo mode AND
 # Imagine from Scratch, the lead record (render, brief, verified email), the
 # dashboard, the catalogue load, white label on their own domain, and live in
-# weeks. 150 to 180 words, which is the ceiling before a cold reader skims.
+# weeks. 150 to 180 words, the ceiling before a cold reader starts skimming.
 #
-# The opening paragraph is segment aware and the rest is variant aware, so
-# there are six openings over two bodies rather than one message for everyone.
+# THREE things vary, and all three have to, or the test is not clean:
+#   the ARM decides the argument, and the subject line has to match the arm or
+#     the two are testing different things at once;
+#   the SEGMENT decides the opening two lines, which is where the
+#     personalisation lives;
+#   the THREAD decides which of the two people at a company gets which shape.
+#     The first pass at this used arm and segment only, and every one of the
+#     82 two-person companies received a message 1 identical apart from the
+#     greeting. Thread B now opens on the outcome and closes by naming the
+#     colleague, so the two read as two people writing, not one mail merge.
 #
-# NOTE ON DATA. There are no published performance figures for Showhouse and
-# the MEC case study carries none, so none are claimed. The numbers in these
-# emails are the READER'S own: what a sample costs them to make and post, and
-# what their own traffic is worth. Asking a manufacturer to price their own
-# sample is not a claim, and it is more persuasive than a statistic they have
-# no reason to believe. Replace this the day Abdullah gets one real figure.
+# NOTE ON DATA. Showhouse publishes no performance figures and the MEC case
+# study carries none, so none are claimed. The only numbers these emails
+# invoke are the READER'S own: what a sample costs them to make and post.
+# Asking a manufacturer to price their own sample is a question, not a claim,
+# and it beats a statistic they have no reason to believe. Replace this the
+# day one real figure exists.
 
-SENDER = 'Haroon\nShowhouse'      # plain text, no block, no logo, per 22 Sept call
+SENDER = 'Haroon\nShowhouse'      # plain text, no block, no logo, per the 22 Sept call
+
+# Subject banks are keyed by ARM then SEGMENT. Keeping them arm-aware matters:
+# a cost-side subject over a revenue-side body would mean the A/B is measuring
+# two changes at once and neither result would be readable.
+S1 = {
+ 'R': {
+  'C': ["What {tool} doesn't tell you",
+        "{tool} renders it, then they're gone",
+        'After the render, who was it?',
+        '{tool}, and the name behind it'],
+  'A': ['The enquiries {dom} never gets',
+        'Interested, but never in touch',
+        'Why most visitors never ask',
+        'The ones who never make contact'],
+  'B': ['Your products, in their own room',
+        "What {dom} can't show a buyer",
+        "The room they're standing in",
+        "Traffic {dom} can't put a name to",
+        'Browsed, closed, gone'],
+ },
+ 'C': {
+  'C': ['Who is serious, before you ship',
+        '{tool}, and the samples that follow',
+        'The samples you would stop posting',
+        'Before the next sample goes out'],
+  'A': ['Before the sample goes in the post',
+        'The week you lose to a sample',
+        'Samples that were never going to land',
+        'The cost of quoting from a description'],
+  'B': ['The samples that never convert',
+        'Before the sample goes in the post',
+        'Who is serious, before you ship',
+        'The week between sample and answer'],
+ },
+}
+
+def subject1(arm, seg, f, co, dom, tool, thread='A'):
+    """Pick and fill a message 1 subject, then guard the 50 character ceiling.
+
+    {tool} and {dom} are both variable length, so a line that measures fine on
+    one row overflows on another; anything over 50 falls back to the shortest
+    option in the same bank rather than going out truncated. Rows with no tool
+    name detected drop the options that name one, since the fallback phrase
+    reads wrong at the start of a subject."""
+    bank = S1[arm][seg]
+    if not tool:
+        bank = [b for b in bank if '{tool}' not in b] or bank
+    t = tool or 'your visualiser'
+    # Base index from the COMPANY, then step one along for thread B. Hashing
+    # the person's name instead left 18 of the 82 two-person companies with
+    # both people on the same subject, which is what a four-option bank gives
+    # you by chance. The offset makes a clash impossible rather than unlikely.
+    out = pick(bank, co, 1, 0 if thread == 'A' else 1).format(dom=dom, tool=t)
+    if len(out) <= 50:
+        return out
+    return min((b.format(dom=dom, tool=t) for b in bank), key=len)
 
 def hook1(seg, co, dom, tool, hook, basic):
-    """First two lines. Segment aware, because the reason they are losing the
-    visitor is different in each one and that is the whole personalisation."""
+    """The opening two lines. Segment aware, because the reason they are
+    losing the visitor is different in each one, and that is the whole of the
+    personalisation."""
     if seg == 'C':
         t = tool or 'your room visualiser'
         return (f"You already run {t}, so someone can see your products in a room. "
@@ -484,41 +560,78 @@ def hook1(seg, co, dom, tool, hook, basic):
     return (f"{first}\n\nWhat it can't do is show someone your product in the room "
             f"they're standing in. So they look, decide, and go.")
 
-def msg1(variant, seg, f, co, dom, tool, hook, basic, url):
-    top = hook1(seg, co, dom, tool, hook, basic)
-    if variant == 'R':
-        middle = (f"Showhouse sits on {dom} under your own branding, so nobody sees our name. "
-                  f"A visitor photographs their room and your product appears in it. Or they "
-                  f"describe what they're imagining and it's generated from your real "
-                  f"collections and finishes.\n\n"
-                  f"The image only unlocks once they confirm their email. So you get a lead: "
-                  f"the render, a short brief in their own words, and a verified address, all "
-                  f"in one dashboard.\n\n"
-                  f"Visitors also stay on the page instead of bouncing, and every render "
-                  f"builds visual content around your own products.\n\n"
-                  f"We load your actual catalogue first, so nothing renders that you can't "
-                  f"make. It goes live in weeks.")
-        cta = f"Try it on a photo of your own room: {url}\n\nWant one with {co} products in it? Send me a collection name."
-    else:
-        middle = (f"Every sample you post costs you something, and most of them go to people "
-                  f"who were never going to order.\n\n"
-                  f"Showhouse puts the decision before the sample. On {dom}, under your own "
-                  f"branding, a visitor photographs their room and sees your product in it, or "
-                  f"describes what they want and gets it generated from your real collections.\n\n"
-                  f"They confirm an email to keep the image. You get the render, a brief in "
-                  f"their words and a verified address in one dashboard, so you know who's "
-                  f"serious before anything ships.\n\n"
-                  f"Your own catalogue goes in first, so nothing renders that you don't make. "
-                  f"Live in weeks.")
-        cta = f"Have a go on your own room photo: {url}\n\nWant one loaded with {co} products? Just name a collection."
-    return f"Hello {f},\n\n{top}\n\n{middle}\n\n{cta}\n\n{SENDER}"
+def msg1(arm, thread, seg, f, co, dom, tool, hook, basic, url, partner):
+    if thread == 'A':
+        top = hook1(seg, co, dom, tool, hook, basic)
+        if arm == 'R':
+            mid = (f"Showhouse sits on {dom} under your own branding, so nobody sees our name. "
+                   f"A visitor photographs their room and your product appears in it. Or they "
+                   f"describe what they're imagining and it's generated from your real "
+                   f"collections and finishes.\n\n"
+                   f"The image only unlocks once they confirm their email. So you get a lead: "
+                   f"the render, a short brief in their own words, and a verified address, all "
+                   f"in one dashboard.\n\n"
+                   f"Visitors also stay on the page instead of bouncing, and every render "
+                   f"builds visual content around your own products.\n\n"
+                   f"We load your actual catalogue first, so nothing renders that you can't "
+                   f"make. It goes live in weeks.")
+            cta = (f"Try it on a photo of your own room: {url}\n\n"
+                   f"Want one with {co} products in it? Send me a collection name.")
+        else:
+            mid = (f"Every sample you post costs you something, and most of them go to people "
+                   f"who were never going to order.\n\n"
+                   f"Showhouse puts the decision before the sample. On {dom}, under your own "
+                   f"branding, a visitor photographs their room and sees your product in it, or "
+                   f"describes what they want and gets it generated from your real collections.\n\n"
+                   f"They confirm an email to keep the image. You get the render, a brief in "
+                   f"their words and a verified address in one dashboard, so you know who's "
+                   f"serious before anything ships.\n\n"
+                   f"Your own catalogue goes in first, so nothing renders that you don't make. "
+                   f"Live in weeks.")
+            cta = (f"Have a go on your own room photo: {url}\n\n"
+                   f"Want one loaded with {co} products? Just name a collection.")
+        return f"Hello {f},\n\n{top}\n\n{mid}\n\n{cta}\n\n{SENDER}"
+
+    # Thread B. Same arm, opposite shape: it opens on the outcome and works
+    # back to the mechanism, so the colleague reading both sees two messages
+    # rather than one merge with a different name at the top.
+    note = (f"\n\nI've written to {partner} as well, since I couldn't tell from outside "
+            f"which of you this sits with." if partner else '')
+    if arm == 'R':
+        return (f"Hello {f},\n\n"
+                f"A quick one about {dom}.\n\n"
+                f"Imagine a visitor leaves you their name, a photo of their own room with your "
+                f"product rendered into it, and a short brief saying what they were after. "
+                f"That is what lands in the dashboard, and the email is verified before the "
+                f"image unlocks.\n\n"
+                f"Showhouse is how they get there. It runs on your own domain under your "
+                f"branding, so nobody sees our name. They photograph a room and your product "
+                f"appears in it, or they describe what they're picturing and it's generated "
+                f"from your real collections.\n\n"
+                f"We load your catalogue first, so nothing comes back in a finish you don't "
+                f"make, and the whole thing is live in weeks rather than quarters. Your logo, "
+                f"your colours, your domain.{note}\n\n"
+                f"Try it on your own room photo: {url}\n\n{SENDER}")
+    return (f"Hello {f},\n\n"
+            f"A quick one about {dom}.\n\n"
+            f"Right now you find out who's serious after the sample has shipped. Packing, "
+            f"courier and a week of waiting, mostly for people who were never going to order.\n\n"
+            f"Showhouse moves that to the website. Under your own branding, on your own domain, "
+            f"a visitor photographs their room and sees your product in it, or describes what "
+            f"they want and gets it generated from your real collections. They confirm an email "
+            f"to keep the image.\n\n"
+            f"You get the render, a brief in their words and a verified address in one "
+            f"dashboard, so the samples go to the people worth sending them to.\n\n"
+            f"Your catalogue goes in first, so nothing renders that you don't make, and it's "
+            f"live in weeks rather than quarters. Your logo, your colours, your domain.{note}\n\n"
+            f"Have a look: {url}\n\n{SENDER}")
 
 def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant):
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = subject1('CA', f, co, dom, tool)
-        b1 = msg1(variant, 'C', f, co, dom, tool, hook, False, url)
+        s1 = subject1(variant, 'C', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
 
@@ -530,8 +643,8 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = subject1('CB', f, co, dom, tool)
-        b1 = msg1(variant, 'C', f, co, dom, tool, hook, False, url)
+        s1 = subject1(variant, 'C', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['C'+thread], f+co, 3), b3)
@@ -541,8 +654,8 @@ def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant):
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = subject1('AA', f, co, dom, tool)
-        b1 = msg1(variant, 'A', f, co, dom, tool, hook, False, url)
+        s1 = subject1(variant, 'A', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
 
@@ -554,8 +667,8 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = subject1('AB', f, co, dom, tool)
-        b1 = msg1(variant, 'A', f, co, dom, tool, hook, False, url)
+        s1 = subject1(variant, 'A', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['A'+thread], f+co, 3), b3)
@@ -570,12 +683,12 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant)
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = subject1('BA', f, co, dom, tool)
-        b1 = msg1(variant, 'B', f, co, dom, tool, hook, basic, url)
+        s1 = subject1(variant, 'B', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
         # which is the phrasing pattern that sank campaign 2.
-        if (hash((f, co)) & 1):
+        if (stable(f, co) & 1):
             b3 = f"""Hello {f},
 
 Here's the bit people don't usually write back to say.
@@ -598,8 +711,8 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = subject1('BB', f, co, dom, tool)
-        b1 = msg1(variant, 'B', f, co, dom, tool, hook, basic, url)
+        s1 = subject1(variant, 'B', f, co, dom, tool, thread)
+        b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['B'+thread], f+co, 3), b3)
@@ -627,7 +740,7 @@ for r in rows:
     seg = 'C' if tryon == 'yes' else ('A' if lvl == 'MANUAL' else 'B')
     # A/B arm for message 1, assigned per COMPANY rather than per contact, so
     # the two people at a two-person company never receive different pitches.
-    variant = 'R' if (hash(('arm', co_raw)) & 1) else 'C'
+    variant = 'R' if (stable('arm', co_raw) & 1) else 'C'
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
     path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
     url = BASE + path
