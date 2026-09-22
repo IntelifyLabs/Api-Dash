@@ -260,16 +260,76 @@ def pick(bank, email, salt):
 
 DEMO = 'https://www.tryshowhouse.com/#book'
 
+# Message 1 subject lines, rewritten 22 Sept.
+#
+# Two problems with the old set. They were all lower case, which is exactly
+# what makes a subject read as a newsletter rather than a person, and segments
+# C and A carried one fixed line each, so a single string went to every row in
+# the segment. Sentence case fixes the first. A bank per segment and thread
+# fixes the second.
+#
+# Deliberately NOT the direct vendor form ("AI Visualizer for {company}").
+# Every inbox on this list is full of that shape right now, and "AI" in a
+# subject is badly fatigued. These lead on the prospect's own fact instead:
+# the name of the tool they already run, their own domain, or the specific
+# thing their site cannot do. That is the part a bulk sender cannot fake.
+#
+# Rules held: under 50 characters so phones do not truncate, no fake Re:,
+# no all caps, no punctuation tricks, no filtered words.
 S1 = {
- 'BA': ['your products, in their own room',
-        "what {dom} can't show them",
-        "the room they're standing in",
-        'their room photo, your tile in it'],
- 'BB': ['every wall becomes a live product page',
-        'the page they show their partner',
-        'a catalogue gets looked at and closed',
-        'what a visitor leaves behind'],
+ # They already run a visualiser. Naming it is the strongest personalisation
+ # available anywhere on this list, so three of the four use it.
+ 'CA': ["What {tool} doesn't tell you",
+        "{tool} renders it, then they're gone",
+        'After the render, who was it?',
+        '{tool}, and the name behind it'],
+ 'CB': ['Every render, and nobody to call',
+        "The part {dom} doesn't record",
+        'Which finishes actually sell',
+        'Renders without the record'],
+ # A person does the visualising today, and a sample usually follows.
+ 'AA': ['Before the sample goes in the post',
+        'The week you lose to a sample',
+        'When the brief arrives as words',
+        'Quoting from a description'],
+ 'AB': ['The enquiries {dom} never gets',
+        'Interested, but never in touch',
+        'Why most visitors never ask',
+        'The ones who never make contact'],
+ # No design step, or filters only. The largest cohort, so the widest bank.
+ 'BA': ['Your products, in their own room',
+        "What {dom} can't show a buyer",
+        "The room they're standing in",
+        'Seen on their wall, not in a catalogue',
+        'A photo of their room, your product in it'],
+ 'BB': ['A catalogue gets looked at and closed',
+        "The page they'd show their partner",
+        'What a visitor leaves behind',
+        "Traffic {dom} can't put a name to",
+        'Browsed, closed, gone'],
 }
+
+def subject1(key, f, co, dom, tool):
+    """Pick and fill a message 1 subject, then guard the 50 character ceiling.
+
+    {tool} and {dom} are both variable length: the tool fallback is the
+    20-character "your room visualiser" and domains run to 22 characters, so a
+    line that measures fine on one row can overflow on another. Anything over
+    50 falls back to the shortest option in the same bank rather than being
+    sent truncated."""
+    bank = S1[key]
+    # Where no real tool name was found the fallback is the lower-case phrase
+    # "your room visualiser", which reads wrong at the start of a subject:
+    # "your room visualiser, and the name behind it". Those rows take the
+    # options that do not name a tool instead.
+    if not tool:
+        bank = [b for b in bank if '{tool}' not in b] or bank
+    out = pick(bank, f + co, 1).format(dom=dom, tool=tool or 'your visualiser')
+    if len(out) <= 50:
+        return out
+    filled = [b.format(dom=dom, tool=tool or 'your visualiser') for b in bank]
+    return min(filled, key=len)
+
 S2 = {
  'A': ['what one of these looks like when it lands',
        'easier to show than explain',
@@ -382,7 +442,7 @@ def variant_C(f, co, dom, tool, hook, thread, partner, url, lab):
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = f'{t} shows the room, and then what'
+        s1 = subject1('CA', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 You already run {t}, so someone can see your products in their own room. Most brands still can't do that.
@@ -405,7 +465,7 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = "the part a visualiser doesn't keep"
+        s1 = subject1('CB', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 Quick thought about {dom} rather than a pitch.
@@ -426,7 +486,7 @@ def variant_A(f, co, dom, tool, hook, thread, partner, url, lab):
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = 'before they order a sample'
+        s1 = subject1('AA', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 {line}
@@ -449,7 +509,7 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = 'the visitors who never get in touch'
+        s1 = subject1('AB', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 {line}
@@ -475,7 +535,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab):
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = pick(S1['BA'], f + co, 1).format(dom=dom)
+        s1 = subject1('BA', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 {line}
@@ -513,7 +573,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = pick(S1['BB'], f + co, 1).format(dom=dom)
+        s1 = subject1('BB', f, co, dom, tool)
         b1 = f"""Hello {f},
 
 Quick thought about {dom} rather than a pitch.
