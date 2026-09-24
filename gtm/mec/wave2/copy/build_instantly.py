@@ -287,6 +287,78 @@ DEMO = 'https://www.tryshowhouse.com/#book'
 #
 # Rules held: under 50 characters so phones do not truncate, no fake Re:,
 # no all caps, no punctuation tricks, no filtered words.
+# ── trade show hooks ─────────────────────────────────────────────────
+# Every row was sourced from a directory that says WHEN the company is in a
+# hall, and 366 of 439 carry the stand number itself. That is the most
+# time-bound and most checkable hook available anywhere in this campaign, so
+# message 1's subject now leads on it.
+#
+# The timing had to be checked rather than assumed, and it inverted the plan.
+# Cersaie 2026 ran 21 to 25 September 2026, which is THIS WEEK. The 357 rows
+# sourced from it are standing in a hall in Bologna right now, so "before your
+# Cersaie 2027 visit" would be addressing an event a year out while they work
+# a stand today. Those rows get a POST show hook instead: they come home to a
+# pile of badge scans, which is the exact moment a lead with a render and a
+# verified email attached makes sense. The trade-show follow-up window runs
+# for weeks, so this still reads right by the time warm-up clears.
+#
+# The other three are genuinely ahead, so they keep the "before" framing:
+#   Heimtextil 2027   12 to 15 January, Frankfurt
+#   TISE 2027          2 to 4 February, Las Vegas
+#   Coverings 2027     6 to 9 April, Orlando
+# TCNA is a membership, not a show, so those 22 rows keep a neutral subject.
+#
+# The subject is now the SAME for both A/B arms on a given row. That is
+# deliberate and it improves the test: with the subject held constant, the
+# only thing separating the arms is the body, which is what we are trying to
+# measure. Arm-flavoured subjects meant two variables moving at once.
+SHOW = {
+ 'cersaie': ['After Bologna',
+             'Back from Cersaie',
+             'The cards you brought back from Bologna',
+             'Cersaie is over, the leads are not',
+             '{hall}, and the year after it',
+             'What happens to the Cersaie contacts'],
+ 'heimtextil': ['Before Frankfurt in January',
+                'Between now and Heimtextil',
+                'Ahead of Heimtextil 2027',
+                'Frankfurt in January, and your website'],
+ 'tise': ['Before Las Vegas in February',
+          'Between now and TISE',
+          'Ahead of TISE 2027',
+          'Las Vegas in February, and your website'],
+ 'coverings': ['Before Orlando in April',
+               'Between now and Coverings',
+               'Ahead of Coverings 2027',
+               'Orlando in April, and your website'],
+}
+
+def show_key(source):
+    """Cersaie wins on a combined row. It is the most recent, it is the only
+    one that just happened, and it is the one carrying a stand number."""
+    src = (source or '').lower()
+    if 'cersaie' in src:    return 'cersaie'
+    if 'heimtextil' in src: return 'heimtextil'
+    if 'tise' in src:       return 'tise'
+    if 'coverings' in src:  return 'coverings'
+    return ''               # TCNA and anything unsourced
+
+def hall_of(stand):
+    """'Hall 30 Stand B84-C83' -> 'Hall 30'. Anything else returns blank and
+    the hall-bearing option drops out of the bank for that row."""
+    m = re.match(r'\s*(Hall\s+\w+)', stand or '', re.I)
+    return m.group(1) if m else ''
+
+def show_subject(key, hall, co, thread):
+    bank = SHOW[key]
+    if not hall:
+        bank = [b for b in bank if '{hall}' not in b]
+    out = pick(bank, co, 's', 0 if thread == 'A' else 1).format(hall=hall)
+    if len(out) <= 50:
+        return out
+    fits = sorted((b.format(hall=hall) for b in bank), key=len)
+    return fits[(0 if thread == 'A' else 1) % len(fits)]
+
 S1 = {
  # They already run a visualiser. Naming it is the strongest personalisation
  # available anywhere on this list, so three of the four use it.
@@ -491,6 +563,78 @@ SENDER = 'Regards,\n\nHaroon\nTriminage'
 # Subject banks are keyed by ARM then SEGMENT. Keeping them arm-aware matters:
 # a cost-side subject over a revenue-side body would mean the A/B is measuring
 # two changes at once and neither result would be readable.
+# ── trade show hooks ─────────────────────────────────────────────────
+# Every row was sourced from a directory that says WHEN the company is in a
+# hall, and 366 of 439 carry the stand number itself. That is the most
+# time-bound and most checkable hook available anywhere in this campaign, so
+# message 1's subject now leads on it.
+#
+# The timing had to be checked rather than assumed, and it inverted the plan.
+# Cersaie 2026 ran 21 to 25 September 2026, which is THIS WEEK. The 357 rows
+# sourced from it are standing in a hall in Bologna right now, so "before your
+# Cersaie 2027 visit" would be addressing an event a year out while they work
+# a stand today. Those rows get a POST show hook instead: they come home to a
+# pile of badge scans, which is the exact moment a lead with a render and a
+# verified email attached makes sense. The trade-show follow-up window runs
+# for weeks, so this still reads right by the time warm-up clears.
+#
+# The other three are genuinely ahead, so they keep the "before" framing:
+#   Heimtextil 2027   12 to 15 January, Frankfurt
+#   TISE 2027          2 to 4 February, Las Vegas
+#   Coverings 2027     6 to 9 April, Orlando
+# TCNA is a membership, not a show, so those 22 rows keep a neutral subject.
+#
+# The subject is now the SAME for both A/B arms on a given row. That is
+# deliberate and it improves the test: with the subject held constant, the
+# only thing separating the arms is the body, which is what we are trying to
+# measure. Arm-flavoured subjects meant two variables moving at once.
+SHOW = {
+ 'cersaie': ['After Bologna',
+             'Back from Cersaie',
+             'The cards you brought back from Bologna',
+             'Cersaie is over, the leads are not',
+             '{hall}, and the year after it',
+             'What happens to the Cersaie contacts'],
+ 'heimtextil': ['Before Frankfurt in January',
+                'Between now and Heimtextil',
+                'Ahead of Heimtextil 2027',
+                'Frankfurt in January, and your website'],
+ 'tise': ['Before Las Vegas in February',
+          'Between now and TISE',
+          'Ahead of TISE 2027',
+          'Las Vegas in February, and your website'],
+ 'coverings': ['Before Orlando in April',
+               'Between now and Coverings',
+               'Ahead of Coverings 2027',
+               'Orlando in April, and your website'],
+}
+
+def show_key(source):
+    """Cersaie wins on a combined row. It is the most recent, it is the only
+    one that just happened, and it is the one carrying a stand number."""
+    src = (source or '').lower()
+    if 'cersaie' in src:    return 'cersaie'
+    if 'heimtextil' in src: return 'heimtextil'
+    if 'tise' in src:       return 'tise'
+    if 'coverings' in src:  return 'coverings'
+    return ''               # TCNA and anything unsourced
+
+def hall_of(stand):
+    """'Hall 30 Stand B84-C83' -> 'Hall 30'. Anything else returns blank and
+    the hall-bearing option drops out of the bank for that row."""
+    m = re.match(r'\s*(Hall\s+\w+)', stand or '', re.I)
+    return m.group(1) if m else ''
+
+def show_subject(key, hall, co, thread):
+    bank = SHOW[key]
+    if not hall:
+        bank = [b for b in bank if '{hall}' not in b]
+    out = pick(bank, co, 's', 0 if thread == 'A' else 1).format(hall=hall)
+    if len(out) <= 50:
+        return out
+    fits = sorted((b.format(hall=hall) for b in bank), key=len)
+    return fits[(0 if thread == 'A' else 1) % len(fits)]
+
 S1 = {
  'R': {
   'C': ["What {tool} doesn't tell you",
@@ -528,7 +672,7 @@ S1 = {
  },
 }
 
-def subject1(arm, seg, f, co, dom, tool, thread='A'):
+def subject1(arm, seg, f, co, dom, tool, thread='A', show='', hall=''):
     """Pick and fill a message 1 subject, then guard the 50 character ceiling.
 
     {tool} and {dom} are both variable length, so a line that measures fine on
@@ -536,6 +680,8 @@ def subject1(arm, seg, f, co, dom, tool, thread='A'):
     option in the same bank rather than going out truncated. Rows with no tool
     name detected drop the options that name one, since the fallback phrase
     reads wrong at the start of a subject."""
+    if show:
+        return show_subject(show, hall, co, thread)
     bank = S1[arm][seg]
     if not tool:
         bank = [b for b in bank if '{tool}' not in b] or bank
@@ -640,11 +786,11 @@ def msg1(arm, thread, seg, f, co, dom, tool, hook, basic, url, partner):
             f"live in weeks rather than quarters. Your logo, your colours, your domain.{note}\n\n"
             f"Have a look: {url}\n\n{SENDER}")
 
-def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant):
+def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='', hall=''):
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = subject1(variant, 'C', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'C', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
@@ -657,18 +803,18 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = subject1(variant, 'C', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'C', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['C'+thread], f+co, 3), b3)
 
-def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant):
+def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='', hall=''):
     """A person does the visualising today and a sample usually follows."""
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = subject1(variant, 'A', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'A', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
@@ -681,13 +827,13 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = subject1(variant, 'A', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'A', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
     return (s1, b1, pick(S2[thread], f+co, 2), b2, pick(S3['A'+thread], f+co, 3), b3)
 
-def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant):
+def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant, show='', hall=''):
     """No design step, or filters only. Open on what they promise, never on
     what they lack: qualifier 1 records NONE as none found, not none exists."""
     if hook:
@@ -697,7 +843,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant)
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = subject1(variant, 'B', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'B', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
@@ -725,7 +871,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = subject1(variant, 'B', f, co, dom, tool, thread)
+        s1 = subject1(variant, 'B', f, co, dom, tool, thread, show, hall)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -737,7 +883,7 @@ COLS = ['email','first_name','last_name','company_name','website','contact_threa
         'segment_variant','send_day_1','send_day_2','send_day_3',
         'msg_subject_1a','msg_body_1a','msg_subject_1b','msg_body_1b',
         'msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
-        'studio_url','ab_arm','qa_send_flag',
+        'studio_url','ab_arm','qa_show','qa_send_flag',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
 DAYS = {'A': ('1','6','13'), 'B': ('3','9','16')}
@@ -777,6 +923,8 @@ for r in rows:
     # the two people at a two-person company never receive different pitches.
     variant = ARM[co_raw]
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
+    show = show_key(r.get('source'))
+    hall = hall_of(r.get('stand'))
     path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
     url = BASE + path
 
@@ -816,10 +964,10 @@ for r in rows:
         both = {}
         for arm in ('R', 'C'):
             if gen:
-                both[arm] = gen(first, co, dom, tool, hook, thread, partner, url, lab, arm)
+                both[arm] = gen(first, co, dom, tool, hook, thread, partner, url, lab, arm, show, hall)
             else:
                 both[arm] = variant_B(first, co, dom, tool, hook, thread, partner,
-                                      lvl == 'BASIC', url, lab, arm)
+                                      lvl == 'BASIC', url, lab, arm, show, hall)
         s1a, b1a = both['R'][0], both['R'][1]
         s1b, b1b = both['C'][0], both['C'][1]
         _, _, s2, b2, s3, b3 = both['R']
@@ -837,7 +985,7 @@ for r in rows:
             msg_subject_1b=s1b, msg_body_1b=b1b,
             msg_subject_2=s2, msg_body_2=f'{b2}\n\n{SENDER}',
             msg_subject_3=s3, msg_body_3=f'{b3}\n\n{SENDER}',
-            studio_url=url,
+            studio_url=url, qa_show=(show or 'none'),
             # Kept as a balanced fallback. If Instantly randomises step 1 this
             # column is ignored; if you would rather control the split by hand,
             # filter on it, because it is stratified by segment and a random
