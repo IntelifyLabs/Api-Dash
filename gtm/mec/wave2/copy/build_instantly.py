@@ -117,6 +117,12 @@ def titlecase_company(c):
     """ESTUDIO CERAMICO shouted in an email body reads as a mail merge. Only
     fold rows that are fully upper case; leave 41zero42 and Cotto d'Este alone."""
     c = clean(c)
+    # Two rows carry a second brand after a separator, "GTILES - ROCKYLAND"
+    # and "Roca / Lamosa USA". Written out in a sentence that reads as a
+    # merge field, and the spaced hyphen is the one dash the copy rules do
+    # not allow. In both cases the first segment is the brand the domain
+    # belongs to, so that is the one the email should use.
+    c = re.split(r'\s+[-–—/]\s+', c)[0].strip() or c
     if c.isupper() and len(c) > 3:
         out = []
         for i, w in enumerate(c.split()):
@@ -271,148 +277,6 @@ def pick(bank, key, salt, offset=0):
 
 DEMO = 'https://www.tryshowhouse.com/#book'
 
-# Message 1 subject lines, rewritten 22 Sept.
-#
-# Two problems with the old set. They were all lower case, which is exactly
-# what makes a subject read as a newsletter rather than a person, and segments
-# C and A carried one fixed line each, so a single string went to every row in
-# the segment. Sentence case fixes the first. A bank per segment and thread
-# fixes the second.
-#
-# Deliberately NOT the direct vendor form ("AI Visualizer for {company}").
-# Every inbox on this list is full of that shape right now, and "AI" in a
-# subject is badly fatigued. These lead on the prospect's own fact instead:
-# the name of the tool they already run, their own domain, or the specific
-# thing their site cannot do. That is the part a bulk sender cannot fake.
-#
-# Rules held: under 50 characters so phones do not truncate, no fake Re:,
-# no all caps, no punctuation tricks, no filtered words.
-# ── trade show hooks ─────────────────────────────────────────────────
-# Every row was sourced from a directory that says WHEN the company is in a
-# hall, and 366 of 439 carry the stand number itself. That is the most
-# time-bound and most checkable hook available anywhere in this campaign, so
-# message 1's subject now leads on it.
-#
-# The timing had to be checked rather than assumed, and it inverted the plan.
-# Cersaie 2026 ran 21 to 25 September 2026, which is THIS WEEK. The 357 rows
-# sourced from it are standing in a hall in Bologna right now, so "before your
-# Cersaie 2027 visit" would be addressing an event a year out while they work
-# a stand today. Those rows get a POST show hook instead: they come home to a
-# pile of badge scans, which is the exact moment a lead with a render and a
-# verified email attached makes sense. The trade-show follow-up window runs
-# for weeks, so this still reads right by the time warm-up clears.
-#
-# The other three are genuinely ahead, so they keep the "before" framing:
-#   Heimtextil 2027   12 to 15 January, Frankfurt
-#   TISE 2027          2 to 4 February, Las Vegas
-#   Coverings 2027     6 to 9 April, Orlando
-# TCNA is a membership, not a show, so those 22 rows keep a neutral subject.
-#
-# The subject is now the SAME for both A/B arms on a given row. That is
-# deliberate and it improves the test: with the subject held constant, the
-# only thing separating the arms is the body, which is what we are trying to
-# measure. Arm-flavoured subjects meant two variables moving at once.
-SHOW = {
- 'cersaie': ['After Bologna',
-             'Back from Cersaie',
-             'The cards you brought back from Bologna',
-             'Cersaie is over, the leads are not',
-             '{hall}, and the year after it',
-             'What happens to the Cersaie contacts'],
- 'heimtextil': ['Before Frankfurt in January',
-                'Between now and Heimtextil',
-                'Ahead of Heimtextil 2027',
-                'Frankfurt in January, and your website'],
- 'tise': ['Before Las Vegas in February',
-          'Between now and TISE',
-          'Ahead of TISE 2027',
-          'Las Vegas in February, and your website'],
- 'coverings': ['Before Orlando in April',
-               'Between now and Coverings',
-               'Ahead of Coverings 2027',
-               'Orlando in April, and your website'],
-}
-
-def show_key(source):
-    """Cersaie wins on a combined row. It is the most recent, it is the only
-    one that just happened, and it is the one carrying a stand number."""
-    src = (source or '').lower()
-    if 'cersaie' in src:    return 'cersaie'
-    if 'heimtextil' in src: return 'heimtextil'
-    if 'tise' in src:       return 'tise'
-    if 'coverings' in src:  return 'coverings'
-    return ''               # TCNA and anything unsourced
-
-def hall_of(stand):
-    """'Hall 30 Stand B84-C83' -> 'Hall 30'. Anything else returns blank and
-    the hall-bearing option drops out of the bank for that row."""
-    m = re.match(r'\s*(Hall\s+\w+)', stand or '', re.I)
-    return m.group(1) if m else ''
-
-def show_subject(key, hall, co, thread):
-    bank = SHOW[key]
-    if not hall:
-        bank = [b for b in bank if '{hall}' not in b]
-    out = pick(bank, co, 's', 0 if thread == 'A' else 1).format(hall=hall)
-    if len(out) <= 50:
-        return out
-    fits = sorted((b.format(hall=hall) for b in bank), key=len)
-    return fits[(0 if thread == 'A' else 1) % len(fits)]
-
-S1 = {
- # They already run a visualiser. Naming it is the strongest personalisation
- # available anywhere on this list, so three of the four use it.
- 'CA': ["What {tool} doesn't tell you",
-        "{tool} renders it, then they're gone",
-        'After the render, who was it?',
-        '{tool}, and the name behind it'],
- 'CB': ['Every render, and nobody to call',
-        "The part {dom} doesn't record",
-        'Which finishes actually sell',
-        'Renders without the record'],
- # A person does the visualising today, and a sample usually follows.
- 'AA': ['Before the sample goes in the post',
-        'The week you lose to a sample',
-        'When the brief arrives as words',
-        'The cost of quoting from a description'],
- 'AB': ['The enquiries {dom} never gets',
-        'Interested, but never in touch',
-        'Why most visitors never ask',
-        'The ones who never make contact'],
- # No design step, or filters only. The largest cohort, so the widest bank.
- 'BA': ['Your products, in their own room',
-        "What {dom} can't show a buyer",
-        "The room they're standing in",
-        'Seen on their wall, not in a catalogue',
-        'A photo of their room, your product in it'],
- 'BB': ['A catalogue gets looked at and closed',
-        "The page they'd show their partner",
-        'What a visitor leaves behind',
-        "Traffic {dom} can't put a name to",
-        'Browsed, closed, gone'],
-}
-
-def subject1(key, f, co, dom, tool):
-    """Pick and fill a message 1 subject, then guard the 50 character ceiling.
-
-    {tool} and {dom} are both variable length: the tool fallback is the
-    20-character "your room visualiser" and domains run to 22 characters, so a
-    line that measures fine on one row can overflow on another. Anything over
-    50 falls back to the shortest option in the same bank rather than being
-    sent truncated."""
-    bank = S1[key]
-    # Where no real tool name was found the fallback is the lower-case phrase
-    # "your room visualiser", which reads wrong at the start of a subject:
-    # "your room visualiser, and the name behind it". Those rows take the
-    # options that do not name a tool instead.
-    if not tool:
-        bank = [b for b in bank if '{tool}' not in b] or bank
-    out = pick(bank, f + co, 1).format(dom=dom, tool=tool or 'your visualiser')
-    if len(out) <= 50:
-        return out
-    filled = [b.format(dom=dom, tool=tool or 'your visualiser') for b in bank]
-    return min(filled, key=len)
-
 S2 = {
  'A': ['what one of these looks like when it lands',
        'easier to show than explain',
@@ -563,77 +427,72 @@ SENDER = 'Regards,\n\nHaroon\nTriminage'
 # Subject banks are keyed by ARM then SEGMENT. Keeping them arm-aware matters:
 # a cost-side subject over a revenue-side body would mean the A/B is measuring
 # two changes at once and neither result would be readable.
-# ── trade show hooks ─────────────────────────────────────────────────
-# Every row was sourced from a directory that says WHEN the company is in a
-# hall, and 366 of 439 carry the stand number itself. That is the most
-# time-bound and most checkable hook available anywhere in this campaign, so
-# message 1's subject now leads on it.
+# ── message 1 subject lines ──────────────────────────────────────────
+# Rewritten 24 Sept. The previous set drifted onto the lead-capture half of
+# the product, badge scans and dashboards. Showhouse is a VISUALISER: the
+# customer photographs their own room and the brand's product appears in it.
+# Every line below says that, and the trade show is only the timing wrapper.
 #
-# The timing had to be checked rather than assumed, and it inverted the plan.
-# Cersaie 2026 ran 21 to 25 September 2026, which is THIS WEEK. The 357 rows
-# sourced from it are standing in a hall in Bologna right now, so "before your
-# Cersaie 2027 visit" would be addressing an event a year out while they work
-# a stand today. Those rows get a POST show hook instead: they come home to a
-# pile of badge scans, which is the exact moment a lead with a render and a
-# verified email attached makes sense. The trade-show follow-up window runs
-# for weeks, so this still reads right by the time warm-up clears.
+# The two banks are paired to their bodies so subject and first line make the
+# same promise:
+#   PILOT 3 -> arm R, the revenue body. They cannot picture it, so they leave.
+#   PILOT 1 -> arm C, the cost body. Before the next show, stop posting samples.
 #
-# The other three are genuinely ahead, so they keep the "before" framing:
-#   Heimtextil 2027   12 to 15 January, Frankfurt
-#   TISE 2027          2 to 4 February, Las Vegas
-#   Coverings 2027     6 to 9 April, Orlando
-# TCNA is a membership, not a show, so those 22 rows keep a neutral subject.
-#
-# The subject is now the SAME for both A/B arms on a given row. That is
-# deliberate and it improves the test: with the subject held constant, the
-# only thing separating the arms is the body, which is what we are trying to
-# measure. Arm-flavoured subjects meant two variables moving at once.
-SHOW = {
- 'cersaie': ['After Bologna',
-             'Back from Cersaie',
-             'The cards you brought back from Bologna',
-             'Cersaie is over, the leads are not',
-             '{hall}, and the year after it',
-             'What happens to the Cersaie contacts'],
- 'heimtextil': ['Before Frankfurt in January',
-                'Between now and Heimtextil',
-                'Ahead of Heimtextil 2027',
-                'Frankfurt in January, and your website'],
- 'tise': ['Before Las Vegas in February',
-          'Between now and TISE',
-          'Ahead of TISE 2027',
-          'Las Vegas in February, and your website'],
- 'coverings': ['Before Orlando in April',
-               'Between now and Coverings',
-               'Ahead of Coverings 2027',
-               'Orlando in April, and your website'],
-}
+# Show labels come from the row's own source directory. Cersaie 2026 ran 21 to
+# 25 September 2026, so the forward reference is the 2027 edition: for a
+# manufacturer who just came off a stand, that is the planning window rather
+# than a deadline a year out. Rows with no show, the 20 TCNA ones, drop the
+# options carrying a show token and keep the rest.
+SHOW_LABEL = {'cersaie': 'Cersaie 2027', 'coverings': 'Coverings 2027',
+              'heimtextil': 'Heimtextil 2027', 'tise': 'TISE 2027'}
+
+PILOT3 = ["Your catalogue can't show their room",
+          'Stop asking them to imagine it',
+          'A PDF, or their actual bathroom',
+          "They can't picture it. That is the problem",
+          'Your collections, in their own room']
+
+PILOT1 = ['Before {show}, let them see it',
+          'Your products in their rooms by {show}',
+          'Before {show}',
+          'Stop posting samples before {show}',
+          # The 20 TCNA rows carry no show, so every line above drops out for
+          # them. With one survivor left, both people at a two person company
+          # were getting the same subject, which is the one thing that makes a
+          # multi threaded campaign read as a mail merge. These four hold the
+          # same cost side promise without naming a date, and they also pull
+          # down the share of arm C sitting on a single line.
+          '12 months to stop sending samples',
+          'Before the next sample goes out',
+          'Let them see it before you post it',
+          'The samples that never become orders']
+
+def show_subject(arm, show, co, thread):
+    """Arm picks the bank, the row's show fills the token, thread decides which
+    of the two people at a company gets which line."""
+    bank = PILOT1 if arm == 'C' else PILOT3
+    label = SHOW_LABEL.get(show, '')
+    if not label:
+        bank = [b for b in bank if '{show}' not in b] or bank
+    off = 0 if thread == 'A' else 1
+    out = pick(bank, co, 's' + arm, off).format(show=label)
+    if len(out) <= 50:
+        return out
+    fits = sorted((b.format(show=label) for b in bank), key=len)
+    return fits[off % len(fits)]
 
 def show_key(source):
-    """Cersaie wins on a combined row. It is the most recent, it is the only
-    one that just happened, and it is the one carrying a stand number."""
+    """Cersaie wins on a combined row: most recent, and the one just finished."""
     src = (source or '').lower()
     if 'cersaie' in src:    return 'cersaie'
     if 'heimtextil' in src: return 'heimtextil'
     if 'tise' in src:       return 'tise'
     if 'coverings' in src:  return 'coverings'
-    return ''               # TCNA and anything unsourced
+    return ''
 
 def hall_of(stand):
-    """'Hall 30 Stand B84-C83' -> 'Hall 30'. Anything else returns blank and
-    the hall-bearing option drops out of the bank for that row."""
     m = re.match(r'\s*(Hall\s+\w+)', stand or '', re.I)
     return m.group(1) if m else ''
-
-def show_subject(key, hall, co, thread):
-    bank = SHOW[key]
-    if not hall:
-        bank = [b for b in bank if '{hall}' not in b]
-    out = pick(bank, co, 's', 0 if thread == 'A' else 1).format(hall=hall)
-    if len(out) <= 50:
-        return out
-    fits = sorted((b.format(hall=hall) for b in bank), key=len)
-    return fits[(0 if thread == 'A' else 1) % len(fits)]
 
 S1 = {
  'R': {
@@ -680,8 +539,7 @@ def subject1(arm, seg, f, co, dom, tool, thread='A', show='', hall=''):
     option in the same bank rather than going out truncated. Rows with no tool
     name detected drop the options that name one, since the fallback phrase
     reads wrong at the start of a subject."""
-    if show:
-        return show_subject(show, hall, co, thread)
+    return show_subject(arm, show, co, thread)
     bank = S1[arm][seg]
     if not tool:
         bank = [b for b in bank if '{tool}' not in b] or bank
