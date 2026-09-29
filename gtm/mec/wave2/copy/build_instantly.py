@@ -42,6 +42,56 @@ FILTERED = ('free', 'guarantee', 'offer', 'discount', 'click here', 'act now',
             'limited', 'exclusive', 'urgent', 'risk-free', '100%', 'cash',
             'winner', 'opportunity', 'instant', 'no obligation', 'best price')
 
+def fold_token(w):
+    """Title-case every run of letters in one token, so D'ESTE becomes D'Este
+    and TECH.CO becomes Tech.Co. cap() cannot do this: it rewrites the first
+    run only, so it leaves both of those still shouting."""
+    return re.sub(r'[A-Za-z]+', lambda m: m.group().capitalize(), w)
+
+def unshout(text):
+    """Fold text the source was shouting, keeping genuine acronyms.
+
+    The 29 Sept review asked for all four messages to come back clean from a
+    spam checker. They did on trigger words, but capitalised words score the
+    same way and there were two sources of them. Seven prospects write their
+    own tagline in capitals, so quoting them verbatim put "EXPLORE CERAMIC +
+    PORCELAIN" and "WE MANUFACTURE TO MEASURE" inside the body. Eight company
+    names carry a shouted token, so bodies read "Cotto D'ESTE" and "Aixin
+    TECH.CO".
+
+    Two cases, and they need opposite treatment:
+
+      A string that is shouted END TO END is a tagline, and the way a person
+      reads a tagline is as a sentence, so it folds to sentence case. The
+      WORDS never change. They are the prospect's own, inside quotation
+      marks, and editing those would be putting sentences in their mouth,
+      typos included.
+
+      A shouted token inside otherwise normal text is almost always a brand,
+      PORCELANOSA or VIVES or D'ESTE, so it title-cases and keeps its capital.
+
+    Five letters is the floor either way, which leaves EU, USA, WOW, ARTO, CIR,
+    3D and every other real acronym as written."""
+    if text and text == text.upper() and re.search(r'[A-Za-z]{2}', text):
+        return re.sub(r'[a-z]', lambda m: m.group().upper(), text.lower(), count=1)
+    return unshout_tokens(text)
+
+def unshout_tokens(text):
+    """The brand path on its own, for callers that must not take the sentence
+    case one.
+
+    A company name needs this. Sending titlecase_company through unshout()
+    sentence-cased every one of the 361 names the directories hold in capitals,
+    so bodies read "Atlas concorde" and "Akgun seramik". Those names want title
+    case, which titlecase_company already does properly with the connector and
+    acronym rules, so it only needs the shouted-token pass on top for the eight
+    mixed names like "Cotto D'ESTE"."""
+    out = []
+    for w in text.split():
+        bare = re.sub(r'[^A-Za-z]', '', w)
+        out.append(fold_token(w) if len(bare) > 4 and bare.isupper() else w)
+    return ' '.join(out)
+
 def best_quote(ev):
     """Shortest usable phrase wins, not the longest. The quote lands in email 1,
     which has a 90 word ceiling, and taking the longest match pushed 140 of 390
@@ -57,7 +107,7 @@ def best_quote(ev):
         if q.lower().startswith(('home ', 'about ', 'contact ')): continue
         if '—' in q or '–' in q: continue
         if any(w in q.lower() for w in FILTERED): continue
-        out.append(q)
+        out.append(unshout(q))
     return min(out, key=lambda s: len(s.split())) if out else ''
 
 # Tool names worth naming back to the reader. A named tool in the subject line
@@ -123,12 +173,31 @@ def titlecase_company(c):
     # not allow. In both cases the first segment is the brand the domain
     # belongs to, so that is the one the email should use.
     c = re.split(r'\s+[-–—/]\s+', c)[0].strip() or c
+    # Three names carry a directory descriptor after the brand: "JADRANKAMEN
+    # white limestone Croatia/EU", "Images In Tile USA, Inc. dba Bison Coating
+    # & Supply", and a German one running to "GmbH & Co. KG". Written into a
+    # sentence they read as raw data rather than a name. A lower-case word
+    # following a capitalised one is the signal, since a brand does not do
+    # that except through a connector, and de, del, von and the rest are
+    # already listed. Checked against all 439 names: it fires on those three
+    # and nothing else.
+    toks = c.split()
+    for i, w in enumerate(toks[1:], 1):
+        bare, prev = re.sub(r'[^A-Za-z]', '', w), re.sub(r'[^A-Za-z]', '', toks[i-1])
+        if bare and bare.islower() and bare not in CONNECTOR and prev[:1].isupper():
+            c = ' '.join(toks[:i]); break
     if c.isupper() and len(c) > 3:
         out = []
         for i, w in enumerate(c.split()):
             bare = re.sub(r'[^A-Za-z]', '', w)
             if i and w.lower().strip('.,()') in CONNECTOR:
                 out.append(w.lower())
+            elif w.lower().strip('.,()') in CONNECTOR:
+                # A name OPENING on a connector, "LA FABBRICA AVA". The
+                # acronym rule below keeps anything of three letters or fewer
+                # as written, which left the body reading "LA Fabbrica AVA".
+                # A leading connector is a word, not an acronym.
+                out.append(cap(w))
             elif '.' in w and len(bare) > 1:     # A.A.T.C., S.R.L. stay as written
                 out.append(w)
             elif len(bare) <= 3:                 # ABK, AIP, CIR, KWC are acronyms
@@ -136,6 +205,12 @@ def titlecase_company(c):
             else:
                 out.append(cap(w))
         c = ' '.join(out)
+    # AFTER the branch above, never before. Folding first turned "FABBRICA DEL
+    # SALE" into "Fabbrica DEL SALE": the leading token stopped the name being
+    # upper case, so the branch that handles connectors and acronyms properly
+    # never ran and the rest kept shouting. This pass is only for the eight
+    # names that arrive part shouted, like "Cotto D'ESTE".
+    c = unshout_tokens(c)
     prev = None
     while prev != c:                      # "Bertolotto S.p.A. Srl" needs two passes,
         prev = c                          # and stripping "AND CO." leaves a dangling
@@ -446,39 +521,69 @@ SENDER = 'Regards,\n\nHaroon\nTriminage'
 SHOW_LABEL = {'cersaie': 'Cersaie 2027', 'coverings': 'Coverings 2027',
               'heimtextil': 'Heimtextil 2027', 'tise': 'TISE 2027'}
 
-PILOT3 = ["Your catalogue can't show their room",
-          'Stop asking them to imagine it',
-          'A PDF, or their actual bathroom',
-          "They can't picture it. That is the problem",
-          'Your collections, in their own room']
+# Revised 29 Sept on review feedback: "vague and might get skipped in a busy
+# inbox. Make them clearer and more direct so the reader immediately knows why
+# the email is relevant to them."
+#
+# Four lines went for being about nothing a reader can see: "Stop asking them
+# to imagine it", "They can't picture it. That is the problem", "Before
+# {show}", "12 months to stop sending samples". Each one needed the body to
+# explain it, which is exactly backwards.
+#
+# What replaced them names the PRODUCT THE ROW SELLS, taken from the studio it
+# routes to, so a tile manufacturer reads "tiles" and a countertop
+# manufacturer reads "countertops". That is the shortest available way to make
+# line one unmistakably theirs, it survives a 50 character ceiling where the
+# domain does not, and it holds on every row because the routing already ran.
+#
+# One curiosity line is kept per bank. The whole list going direct removes the
+# only lever we have on open rate, and the earlier direction was explicitly
+# for subjects that get opened rather than subjects that explain themselves.
+PRODUCT = {'Tile Studio': 'tiles', 'Mosaic Studio': 'mosaics',
+           'Mural Studio': 'wallpaper', 'Surface Studio': 'countertops',
+           'Rug Studio': 'rugs'}
 
-PILOT1 = ['Before {show}, let them see it',
-          'Your products in their rooms by {show}',
-          'Before {show}',
+def product_of(lab):
+    """The 84 HOLD rows route to no studio, so they fall back to the neutral
+    word. They are not being sent anyway."""
+    return PRODUCT.get(lab, 'products')
+
+PILOT3 = ["Show your {product} in a buyer's own room",
+          'Your {product}, in their own room photo',
+          "Your catalogue can't show their room",
+          'Your collections, in their own room',
+          'Browsed your collections, then left',
+          'A PDF page, or their actual room']
+
+# Three of these name the show, four do not. The 20 rows with no sourced show
+# drop the first three and still have four to draw on, which is what stopped
+# both people at those companies getting the same line.
+PILOT1 = ['Before {show}, let them see it in the room',
+          'Your {product} in their rooms by {show}',
           'Stop posting samples before {show}',
-          # The 20 TCNA rows carry no show, so every line above drops out for
-          # them. With one survivor left, both people at a two person company
-          # were getting the same subject, which is the one thing that makes a
-          # multi threaded campaign read as a mail merge. These four hold the
-          # same cost side promise without naming a date, and they also pull
-          # down the share of arm C sitting on a single line.
-          '12 months to stop sending samples',
-          'Before the next sample goes out',
-          'Let them see it before you post it',
+          'Fewer samples between now and {show}',
+          'Send samples to buyers who already decided',
+          'Let them see it before you post a sample',
+          'Your {product}, seen before the sample ships',
           'The samples that never become orders']
 
-def show_subject(arm, show, co, thread):
-    """Arm picks the bank, the row's show fills the token, thread decides which
-    of the two people at a company gets which line."""
+def show_subject(arm, show, co, thread, lab=''):
+    """Arm picks the bank, the row's show and product fill the tokens, thread
+    decides which of the two people at a company gets which line."""
     bank = PILOT1 if arm == 'C' else PILOT3
     label = SHOW_LABEL.get(show, '')
     if not label:
         bank = [b for b in bank if '{show}' not in b] or bank
+    prod = product_of(lab)
+    fill = lambda b: b.format(show=label, product=prod)
     off = 0 if thread == 'A' else 1
-    out = pick(bank, co, 's' + arm, off).format(show=label)
+    out = fill(pick(bank, co, 's' + arm, off))
     if len(out) <= 50:
         return out
-    fits = sorted((b.format(show=label) for b in bank), key=len)
+    # Ranking what fits and keeping the thread offset, rather than taking the
+    # single shortest, is what stops a long name putting both people at a
+    # company on one subject.
+    fits = sorted((fill(b) for b in bank), key=len)
     return fits[off % len(fits)]
 
 def show_key(source):
@@ -493,69 +598,6 @@ def show_key(source):
 def hall_of(stand):
     m = re.match(r'\s*(Hall\s+\w+)', stand or '', re.I)
     return m.group(1) if m else ''
-
-S1 = {
- 'R': {
-  'C': ["What {tool} doesn't tell you",
-        "{tool} renders it, then they're gone",
-        'After the render, who was it?',
-        '{tool}, and the name behind it',
-        'Every render, and nobody to call',
-        "The part {dom} does not record"],
-  'A': ['The enquiries {dom} never gets',
-        'Interested, but never in touch',
-        'Why most visitors never ask',
-        'The ones who never make contact'],
-  'B': ['Your products, in their own room',
-        "What {dom} can't show a buyer",
-        "The room they're standing in",
-        "Traffic {dom} can't put a name to",
-        'Browsed, closed, gone'],
- },
- 'C': {
-  'C': ['Who is serious, before you ship',
-        '{tool}, and the samples that follow',
-        'The samples {dom} would stop posting',
-        'Samples, before or after {tool}',
-        'Before the next sample goes out'],
-  'A': ['Before the sample goes in the post',
-        'The week you lose to a sample',
-        'Samples {dom} did not need to send',
-        'Samples that were never going to land',
-        'The cost of quoting from a description'],
-  'B': ['The samples that never convert',
-        'Before the sample goes in the post',
-        'Samples {dom} did not need to send',
-        'Who is serious, before you ship',
-        'The week between sample and answer'],
- },
-}
-
-def subject1(arm, seg, f, co, dom, tool, thread='A', show='', hall=''):
-    """Pick and fill a message 1 subject, then guard the 50 character ceiling.
-
-    {tool} and {dom} are both variable length, so a line that measures fine on
-    one row overflows on another; anything over 50 falls back to the shortest
-    option in the same bank rather than going out truncated. Rows with no tool
-    name detected drop the options that name one, since the fallback phrase
-    reads wrong at the start of a subject."""
-    return show_subject(arm, show, co, thread)
-    bank = S1[arm][seg]
-    if not tool:
-        bank = [b for b in bank if '{tool}' not in b] or bank
-    t = tool or 'your visualiser'
-    # Base index from the COMPANY, then step one along for thread B. Hashing
-    # the person's name instead left 18 of the 82 two-person companies with
-    # both people on the same subject, which is what a four-option bank gives
-    # you by chance. The offset makes a clash impossible rather than unlikely.
-    off = 0 if thread == 'A' else 1
-    out = pick(bank, co, 1, off).format(dom=dom, tool=t)
-    if len(out) <= 50:
-        return out
-    # Falling back to the single shortest option put both people at a company
-    # on the same subject. Rank what fits and keep the thread offset.
-    fits = sorted((b.format(dom=dom, tool=t) for b in bank), key=len)
-    return fits[off % len(fits)]
 
 def hook1(seg, co, dom, tool, hook, basic):
     """The opening two lines. Segment aware, because the reason they are
@@ -648,7 +690,7 @@ def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = subject1(variant, 'C', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
@@ -661,7 +703,7 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = subject1(variant, 'C', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -672,7 +714,7 @@ def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = subject1(variant, 'A', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
@@ -685,7 +727,7 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = subject1(variant, 'A', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -701,7 +743,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant,
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = subject1(variant, 'B', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
@@ -729,7 +771,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = subject1(variant, 'B', f, co, dom, tool, thread, show, hall)
+        s1 = show_subject(variant, show, co, thread, lab)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -737,11 +779,72 @@ And if it isn't, tell me and I'll stop."""
 
 # ─────────────────────────────── build ───────────────────────────────
 rows = list(csv.DictReader(open(SRC, encoding='utf-8-sig')))
+# ─────────────────── job titles and the decision-maker filter ────────
+# Asked for on 29 Sept: "the CSV doesn't have job titles. Worth adding those in
+# and filtering for decision-makers so we're not wasting sends on people who
+# can't act on this."
+#
+# There are no titles to add. contacts_final.csv has 47 columns and not one of
+# them is a title; the waterfall returned names, emails and LinkedIn URLs only.
+# So the filter ships here unfilled and switches itself on the moment the data
+# exists. titles_worklist.py writes titles_to_enrich.csv, 306 rows with the
+# profile URL where we have one, 276 of 306. Fill the job_title column, save it
+# as titles.csv beside this script, and rerun: every row gets tagged and the
+# people who cannot act on this get flagged without anything else changing.
+#
+# Who can act. The buyer is whoever owns the website and the demand it
+# generates, so marketing, digital, ecommerce and sales leadership, plus the
+# owner or general manager at a company small enough that they decide
+# everything. Who cannot: production, plant, quality, logistics, purchasing and
+# administration. They are real people at real target companies, they just have
+# no say over what goes on the website, and a send to them spends a mailbox's
+# daily allowance for nothing.
+DECIDES = ('marketing', 'digital', 'ecommerce', 'e-commerce', 'brand', 'growth',
+           'communication', 'comunicazione', 'comercial', 'commerciale', 'sales',
+           'ventas', 'vendite', 'export', 'business development', 'revenue',
+           'ceo', 'founder', 'owner', 'partner', 'president', 'managing director',
+           'general manager', 'direttore generale', 'gerente', 'titolare',
+           'amministratore', 'director', 'head of', 'chief', 'cmo', 'cro', 'coo')
+CANNOT = ('production', 'produzione', 'plant', 'factory', 'quality', 'qualità',
+          'logistics', 'logistica', 'warehouse', 'shipping', 'purchasing',
+          'acquisti', 'procurement', 'accounting', 'accounts', 'payroll',
+          'administration', 'amministrazione', 'hr', 'human resources',
+          'health and safety', 'maintenance', 'technician', 'tecnico',
+          'laboratory', 'laboratorio', 'r&d', 'research', 'draughtsman',
+          'receptionist', 'intern', 'apprentice', 'student', 'assistant')
+
+def load_titles(path='titles.csv'):
+    """Optional. No file means the two title columns read 'not enriched',
+    which is the honest state rather than an empty cell that looks like a bug."""
+    try:
+        with open(path, encoding='utf-8-sig') as fh:
+            return {(r.get('email') or '').strip().lower(): (r.get('job_title') or '').strip()
+                    for r in csv.DictReader(fh) if (r.get('email') or '').strip()}
+    except FileNotFoundError:
+        return {}
+
+TITLES = load_titles()
+
+def decides(title):
+    """CANNOT is checked first on purpose. "Production Manager" holds both
+    "production" and "manager", and a plant manager does not buy this."""
+    t = (title or '').lower()
+    if not t:
+        return 'not enriched'
+    if any(w in t for w in CANNOT):
+        return 'no'
+    if any(w in t for w in DECIDES):
+        return 'yes'
+    # Anything else is a title we have not seen rather than a rejection, so it
+    # is surfaced for a human instead of being filtered out silently.
+    return 'review'
+
 COLS = ['email','first_name','last_name','company_name','website','contact_thread',
         'segment_variant','send_day_1','send_day_2','send_day_3',
         'msg_subject_1a','msg_body_1a','msg_subject_1b','msg_body_1b',
         'msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
         'studio_url','ab_arm','qa_show','qa_send_flag',
+        'job_title','qa_decision_maker',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
 DAYS = {'A': ('1','6','13'), 'B': ('3','9','16')}
@@ -856,6 +959,8 @@ for r in rows:
             # most useful filter in the file: hold these until someone decides
             # whether a company that sells no installed surface belongs here.
             qa_send_flag=('send' if sk else 'HOLD no studio'),
+            job_title=(TITLES.get(email) or 'not enriched'),
+            qa_decision_maker=decides(TITLES.get(email)),
             qa_tool_level=lvl, qa_has_tryon=tryon, qa_tool_name=tool, qa_studio=sk,
             qa_hook_quality=hq, qa_hook=hook, qa_partner_email=partner_email,
             qa_country=clean(r['country']), qa_size=clean(r['Size']), qa_evidence=ev))

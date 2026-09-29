@@ -64,3 +64,6 @@ installers/*
 
 # Testing Files & Folders
 test-hive-storage
+
+# enrichment output, not source
+gtm/mec/wave2/copy/titles.csv
