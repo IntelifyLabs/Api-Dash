@@ -89,6 +89,8 @@ PCT   = re.compile(r'\d+\s?%')
 PHONE = re.compile(r'(?:\+\d[\d ()-]{7,}|\b\d{3}[.-]\d{3}[.-]\d{4}\b)')
 FAKE  = re.compile(r'^\s*(re|fwd|fw)\s*:', re.I)
 
+# Message 1 subjects are lower case by design from 30 Sept (Set B), so the
+# caps heuristics below are the only case check that applies to them.
 MESSAGES = [('1a', 'msg_subject_1a', 'msg_body_1a'),
             ('1b', 'msg_subject_1b', 'msg_body_1b'),
             ('2',  'msg_subject_2',  'msg_body_2'),

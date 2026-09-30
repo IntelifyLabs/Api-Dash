@@ -2,22 +2,22 @@
 
 24 shapes across 306 sending rows. Personalisation is filled in from a real row, named under each heading, so what you paste is what lands in an inbox.
 
-Paste each body with its subject into Mail Meteor, GlockApps or Mail Tester. `spam_audit.py` checks all 1224 emails; this file is here so a human can confirm the same set by hand.
+Paste each body with its subject into Mail Meteor, GlockApps or Mail Tester. `spam_audit.py` checks all 1560 emails; this file is here so a human can confirm the same set by hand.
 
 ## Message 1a, segment A, thread A
 
-Example row: Azzurra Ceramica
+Example row: AIP Porte
 
-**Subject:** A PDF page, or their actual room
+**Subject:** who looks after aipporte.com?
 
 ```
-Hello Lorenzo,
+Hello Marco,
 
-Azzurra Ceramica sells bespoke work, and the way in is to contact your team.
+On your own site: "Progetta la tua porta interna".
 
 Every one of those arrives as words, and someone on your side has to turn it into a picture before anything moves.
 
-Showhouse sits on azzurraceramica.it under your own branding, so nobody sees our name. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
+Showhouse sits on aipporte.com under your own branding, so nobody sees our name. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
 
 The image only unlocks once they confirm their email. So you get a lead: the render, a short brief in their own words, and a verified address, all in one dashboard.
 
@@ -25,9 +25,9 @@ Visitors also stay on the page instead of bouncing, and every render builds cont
 
 We load your actual catalogue first, so nothing renders that you can't make. It goes live in weeks.
 
-Try it on a photo of your own room: https://www.tryshowhouse.com/tile
+Try it on a photo of your own room: https://www.tryshowhouse.com
 
-Want one with Azzurra Ceramica products in it? Send me a collection name.
+Want one with AIP Porte products in it? Send me a collection name.
 
 Regards,
 
@@ -39,7 +39,7 @@ Triminage
 
 Example row: Azzurra Ceramica
 
-**Subject:** Show your tiles in a buyer's own room
+**Subject:** who runs azzurraceramica.it?
 
 ```
 Hello Mauro,
@@ -54,7 +54,7 @@ We load your catalogue first, so nothing comes back in a finish you don't make, 
 
 I've written to Lorenzo as well, since I couldn't tell from outside which of you this sits with.
 
-Try it on your own room photo: https://www.tryshowhouse.com/tile
+Try it on your own room photo: https://www.tryshowhouse.com/furniture
 
 Regards,
 
@@ -66,7 +66,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** Show your tiles in a buyer's own room
+**Subject:** the tiles on 41zero42.com
 
 ```
 Hello Frederic,
@@ -97,7 +97,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** Your tiles, in their own room photo
+**Subject:** your tiles on 41zero42.com
 
 ```
 Hello Filippo,
@@ -124,7 +124,7 @@ Triminage
 
 Example row: Aparici
 
-**Subject:** Browsed your collections, then left
+**Subject:** your tiles on aparici.com
 
 ```
 Hello Juan,
@@ -155,7 +155,7 @@ Triminage
 
 Example row: Argenta Ceramica
 
-**Subject:** Your catalogue can't show their room
+**Subject:** the tiles on argentaceramica.com
 
 ```
 Hello David,
@@ -180,28 +180,28 @@ Triminage
 
 ## Message 1b, segment A, thread A
 
-Example row: Azzurra Ceramica
+Example row: AIP Porte
 
-**Subject:** Your tiles in their rooms by Cersaie 2027
+**Subject:** who looks after aipporte.com?
 
 ```
-Hello Lorenzo,
+Hello Marco,
 
-Azzurra Ceramica sells bespoke work, and the way in is to contact your team.
+On your own site: "Progetta la tua porta interna".
 
 Every one of those arrives as words, and someone on your side has to turn it into a picture before anything moves.
 
 Every sample you post costs you something, and most of them go to people who were never going to order.
 
-Showhouse puts the decision before the sample. On azzurraceramica.it, under your own branding, a visitor photographs their room and sees your product in it, or describes what they want and gets it generated from your real collections.
+Showhouse puts the decision before the sample. On aipporte.com, under your own branding, a visitor photographs their room and sees your product in it, or describes what they want and gets it generated from your real collections.
 
 They confirm an email to keep the image. You get the render, a brief in their words and a verified address in one dashboard, so you know who's serious before anything ships.
 
 Your own catalogue goes in first, so nothing renders that you don't make. Live in weeks.
 
-Have a go on your own room photo: https://www.tryshowhouse.com/tile
+Have a go on your own room photo: https://www.tryshowhouse.com
 
-Want one loaded with Azzurra Ceramica products? Just name a collection.
+Want one loaded with AIP Porte products? Just name a collection.
 
 Regards,
 
@@ -213,7 +213,7 @@ Triminage
 
 Example row: Azzurra Ceramica
 
-**Subject:** Stop posting samples before Cersaie 2027
+**Subject:** who runs azzurraceramica.it?
 
 ```
 Hello Mauro,
@@ -230,7 +230,7 @@ Your catalogue goes in first, so nothing renders that you don't make, and it's l
 
 I've written to Lorenzo as well, since I couldn't tell from outside which of you this sits with.
 
-Have a look: https://www.tryshowhouse.com/tile
+Have a look: https://www.tryshowhouse.com/furniture
 
 Regards,
 
@@ -242,7 +242,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** Before Cersaie 2027, let them see it in the room
+**Subject:** the tiles on 41zero42.com
 
 ```
 Hello Frederic,
@@ -273,7 +273,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** Your tiles in their rooms by Cersaie 2027
+**Subject:** your tiles on 41zero42.com
 
 ```
 Hello Filippo,
@@ -302,7 +302,7 @@ Triminage
 
 Example row: Aparici
 
-**Subject:** Your tiles, seen before the sample ships
+**Subject:** your tiles on aparici.com
 
 ```
 Hello Juan,
@@ -333,7 +333,7 @@ Triminage
 
 Example row: Argenta Ceramica
 
-**Subject:** Stop posting samples before Cersaie 2027
+**Subject:** the tiles on argentaceramica.com
 
 ```
 Hello David,
@@ -360,12 +360,12 @@ Triminage
 
 ## Message 2, segment A, thread A
 
-Example row: Azzurra Ceramica
+Example row: AIP Porte
 
-**Subject:** their room, their words, their email
+**Subject:** what one of these looks like when it lands
 
 ```
-Hello Lorenzo,
+Hello Marco,
 
 Easier to show you than explain it.
 
@@ -378,9 +378,9 @@ and an email address they've confirmed
 
 Nobody typed out a description and nobody had to interpret one. They'd already settled the room, the look and the size before your team said a word.
 
-https://www.tryshowhouse.com/tile
+https://www.tryshowhouse.com
 
-Want me to put Azzurra Ceramica products in one so you can see yours?
+Want me to put AIP Porte products in one so you can see yours?
 
 Regards,
 
@@ -405,7 +405,7 @@ The difference with ours is what happens to the visitor afterwards. They confirm
 
 I sent this to Lorenzo too, since I couldn't tell from outside whose call it is.
 
-https://www.tryshowhouse.com/tile
+https://www.tryshowhouse.com/furniture
 
 Regards,
 
@@ -525,18 +525,18 @@ Triminage
 
 ## Message 3, segment A, thread A
 
-Example row: Azzurra Ceramica
+Example row: AIP Porte
 
-**Subject:** the bit people push back on
+**Subject:** nobody wants a machine in the middle
 
 ```
-Hello Lorenzo,
+Hello Marco,
 
 The thing people usually push back on is that they don't want a machine sitting between them and the client. Which is fair, that conversation is the job.
 
 This isn't that. It just means the client turns up having already seen something, so you start at "can we do that in this glaze" instead of "what do you make".
 
-Have a look and see what you think: https://www.tryshowhouse.com/tile
+Have a look and see what you think: https://www.tryshowhouse.com
 
 If it's a no, say so and I'll leave you alone.
 
@@ -561,7 +561,7 @@ Out of everyone who looked at azzurraceramica.it last month, how many did you ge
 
 Whatever that number is, the rest of them liked something enough to look. You just never found out who.
 
-https://www.tryshowhouse.com/tile
+https://www.tryshowhouse.com/furniture
 
 Regards,
 

@@ -228,12 +228,18 @@ def titlecase_company(c):
 # /furniture and /gardens have URLs in the industries list but are NOT in the
 # "five live studios" block, so nothing is routed to them.
 BASE = 'https://www.tryshowhouse.com'
+# Seven studios, corrected 30 Sept off the live page. Furniture and Garden are
+# live with their own panels and descriptions; the earlier read had them as
+# URLs that existed but were not among the studios on offer. That was wrong,
+# and it was holding 24 rows that do have a studio after all.
 STUDIO = {
     'tile':        ('/tile',        'Tile Studio'),
     'rugs':        ('/rugs',        'Rug Studio'),
     'wallpaper':   ('/wallpaper',   'Mural Studio'),
     'countertops': ('/countertops', 'Surface Studio'),
     'mosaic':      ('/mosaic',      'Mosaic Studio'),
+    'furniture':   ('/furniture',   'Furniture Studio'),
+    'gardens':     ('/gardens',     'Garden Studio'),
 }
 
 def studio_key(cat, niche, desc):
@@ -258,6 +264,23 @@ def studio_key(cat, niche, desc):
     def hit(pat, *f): return any(re.search(pat, x) for x in f)
 
     TILE = r'tile|ceramic|porcelain|stoneware|\bgres\b|terracotta|cotto|klinker|azulejo|piastrell|seramik'
+    # Furniture and gardens go FIRST, because a bathroom furniture maker whose
+    # category says "ceramic sanitaryware bathroom furniture" would otherwise
+    # fall through to the tile test. But both need guarding.
+    #
+    # "furnishing" on its own is too loose: Terzadimensione sells "porcelain
+    # stoneware furnishings", which is a tile maker, so the bare word has to
+    # sit next to bathroom or kitchen to count.
+    #
+    # "paver" on its own is worse. ARTO Brick & Tile sells "handcrafted tile
+    # brick pavers" and landed in the Garden Studio, when paver there is a
+    # product type rather than landscaping. Any tile word in the category wins.
+    TILEWORD = r'tile|ceramic tile|porcelain|stoneware|\bgres\b|terracotta|cotto|brick'
+    if hit(r'bathroom furniture|kitchen furniture|laundry furniture|vanit|washbasin'
+           r'|arredobagno|joinery|cabinetry|sanitaryware|sanitary ware'
+           r'|(bathroom|kitchen)[a-z ,]*furnishing', cat):                       return 'furniture'
+    if hit(r'terrace|garden|landscap|outdoor living', cat) or \
+       (hit(r'paver|paving', cat) and not hit(TILEWORD, cat)):                   return 'gardens'
     if hit(r'\bmosaic|mosaico|mozaik', cat):                                    return 'mosaic'
     if hit(r'wallpaper|wall paper|wallcovering|mural|tapet|carta da parati|papel pintado', cat, desc):
         return 'wallpaper'
@@ -265,6 +288,12 @@ def studio_key(cat, niche, desc):
     if hit(TILE, cat):                                                          return 'tile'
     if hit(r'countertop|worktop|benchtop|\bslab|quartz|granite|sintered', cat):  return 'countertops'
     if hit(r'marble|travertine|natural stone|\bstone\b|marmo|marmol', cat):      return 'tile'
+    # Architectural surfaces, skirting, panels and flooring are walls and
+    # floors, so they belong to Tile & Stone, not to the Surface Studio, which
+    # the page scopes to "fabricators, quartz & granite suppliers, kitchen
+    # studios". Skema sells flooring and was landing on countertops.
+    if hit(r'architectural surface|decorative surface|skirting|flooring|panels'
+           r'|architectural decorative|wall covering', cat):                     return 'tile'
     if hit(r'\bmosaic', desc):                                                  return 'mosaic'
     if hit(TILE, desc):                                                         return 'tile'
     return ''
@@ -499,90 +528,93 @@ Whatever that number is, the rest of them liked something enough to look. You ju
 # them rather than a person at the agency that built it.
 SENDER = 'Regards,\n\nHaroon\nTriminage'
 
-# Subject banks are keyed by ARM then SEGMENT. Keeping them arm-aware matters:
-# a cost-side subject over a revenue-side body would mean the A/B is measuring
-# two changes at once and neither result would be readable.
-# ── message 1 subject lines ──────────────────────────────────────────
-# Rewritten 24 Sept. The previous set drifted onto the lead-capture half of
-# the product, badge scans and dashboards. Showhouse is a VISUALISER: the
-# customer photographs their own room and the brand's product appears in it.
-# Every line below says that, and the trade show is only the timing wrapper.
+# ── message 1 subject lines: SET B ───────────────────────────────────
+# Chosen 30 Sept, after three sets were rejected for the same reason. Every
+# one of them was written from OUR chair: "Show your tiles in a buyer's own
+# room", "Retile their room, not your catalogue", "Every home becomes your
+# showroom". Each announces a vendor in the first three words, and the brief
+# was the opposite one: would the person holding this inbox open it.
 #
-# The two banks are paired to their bodies so subject and first line make the
-# same promise:
-#   PILOT 3 -> arm R, the revenue body. They cannot picture it, so they leave.
-#   PILOT 1 -> arm C, the cost body. Before the next show, stop posting samples.
+# WHO THAT IS. A marketing manager, export director or owner at a tile or
+# surface manufacturer. 264 of 390 sit in Italy or Spain and are reading
+# English as a second language. 325 came back from Cersaie five days ago, so
+# this week their inbox is post-show follow-ups from everyone who scanned a
+# badge, distributors chasing stock, and a wall of vendors selling SEO, AI and
+# stand space for 2027. They delete on sight anything opening "Your
+# <product>...", anything starting with an imperative, and anything that reads
+# as a tagline.
 #
-# Show labels come from the row's own source directory. Cersaie 2026 ran 21 to
-# 25 September 2026, so the forward reference is the 2027 edition: for a
-# manufacturer who just came off a stand, that is the planning window rather
-# than a deadline a year out. Rows with no show, the 20 TCNA ones, drop the
-# options carrying a show token and keep the rest.
-SHOW_LABEL = {'cersaie': 'Cersaie 2027', 'coverings': 'Coverings 2027',
-              'heimtextil': 'Heimtextil 2027', 'tise': 'TISE 2027'}
-
-# Revised 29 Sept on review feedback: "vague and might get skipped in a busy
-# inbox. Make them clearer and more direct so the reader immediately knows why
-# the email is relevant to them."
+# So no line here contains our product, our benefit, or a verb we want them to
+# perform. Each one contains something of THEIRS: their domain, and the
+# product they actually sell. It reads as a question from a person who has
+# been on their site, because that is what it is.
 #
-# Four lines went for being about nothing a reader can see: "Stop asking them
-# to imagine it", "They can't picture it. That is the problem", "Before
-# {show}", "12 months to stop sending samples". Each one needed the body to
-# explain it, which is exactly backwards.
+# Two rejected alternatives, for the record. Naming the competitor's
+# visualiser looked like the strongest hook available until the data was
+# checked: 277 rows carry a "tool name" but only 30 are a real brand, the
+# other 247 being the generic words "Visualizer" and "Configurator" that the
+# detector picked up off a nav bar. "Visualizer question" is not
+# personalisation. And the trade show works but expires: Cersaie ended 25
+# September, so "after Cersaie" is sharp this week and stale by late October,
+# which a warm-up delay would eat. The domain never goes off.
 #
-# What replaced them names the PRODUCT THE ROW SELLS, taken from the studio it
-# routes to, so a tile manufacturer reads "tiles" and a countertop
-# manufacturer reads "countertops". That is the shortest available way to make
-# line one unmistakably theirs, it survives a 50 character ceiling where the
-# domain does not, and it holds on every row because the routing already ran.
-#
-# One curiosity line is kept per bank. The whole list going direct removes the
-# only lever we have on open rate, and the earlier direction was explicitly
-# for subjects that get opened rather than subjects that explain themselves.
+# THE SUBJECT IS THE SAME ON BOTH ARMS, by design. Message 1 is an A/B on the
+# BODY, revenue side against cost side. Varying the subject with it would move
+# two things at once and neither number would be readable afterwards.
 PRODUCT = {'Tile Studio': 'tiles', 'Mosaic Studio': 'mosaics',
-           'Mural Studio': 'wallpaper', 'Surface Studio': 'countertops',
-           'Rug Studio': 'rugs'}
+           'Mural Studio': 'wallpaper', 'Surface Studio': 'surfaces',
+           'Rug Studio': 'rugs', 'Furniture Studio': 'furniture',
+           'Garden Studio': 'gardens'}
+# "the tiles enquiries you never get" was ungrammatical on the 30 rows it
+# landed on, so that one frame takes the singular.
+SINGULAR = {'tiles': 'tile', 'mosaics': 'mosaic', 'wallpaper': 'wallpaper',
+            'surfaces': 'surface', 'rugs': 'rug', 'furniture': 'furniture',
+            'gardens': 'garden'}
 
 def product_of(lab):
-    """The 84 HOLD rows route to no studio, so they fall back to the neutral
-    word. They are not being sent anyway."""
-    return PRODUCT.get(lab, 'products')
+    """Blank for the 55 rows with no studio, which then take the domain-only
+    frames. Those still read specific, because the domain is theirs."""
+    return PRODUCT.get(lab, '')
 
-PILOT3 = ["Show your {product} in a buyer's own room",
-          'Your {product}, in their own room photo',
-          "Your catalogue can't show their room",
-          'Your collections, in their own room',
-          'Browsed your collections, then left',
-          'A PDF page, or their actual room']
+# Every frame but one carries the domain, so almost every row gets a subject
+# nobody else on the list receives: 337 distinct lines across 390 rows, the
+# largest share 7 per cent. The previous set ran 11 lines at 19 per cent, and
+# near-identical phrasing across a segment was copy defect four on campaign 2.
+SETB = ['a question about {dom}',
+        'quick question about {dom}',
+        'who runs {dom}?',
+        'who handles {dom}?',
+        'who looks after {dom}?',
+        'the {product} on {dom}',
+        'your {product} on {dom}',
+        '{product} on {dom}, one question',
+        'the {single} enquiries you never get']
+# The 55 rows selling taps, radiators, doors and shower enclosures have no
+# product word, so they drop the four frames that need one.
+SETB_NOPROD = [b for b in SETB if '{product}' not in b and '{single}' not in b] + \
+              ['the enquiries {dom} never gets']
 
-# Three of these name the show, four do not. The 20 rows with no sourced show
-# drop the first three and still have four to draw on, which is what stopped
-# both people at those companies getting the same line.
-PILOT1 = ['Before {show}, let them see it in the room',
-          'Your {product} in their rooms by {show}',
-          'Stop posting samples before {show}',
-          'Fewer samples between now and {show}',
-          'Send samples to buyers who already decided',
-          'Let them see it before you post a sample',
-          'Your {product}, seen before the sample ships',
-          'The samples that never become orders']
+def show_subject(arm, show, co, thread, lab='', dom=''):
+    """Lower case on purpose.
 
-def show_subject(arm, show, co, thread, lab=''):
-    """Arm picks the bank, the row's show and product fill the tokens, thread
-    decides which of the two people at a company gets which line."""
-    bank = PILOT1 if arm == 'C' else PILOT3
-    label = SHOW_LABEL.get(show, '')
-    if not label:
-        bank = [b for b in bank if '{show}' not in b] or bank
+    The earlier rule was that a lower-case subject reads as a newsletter. That
+    was backwards: newsletters arrive in Title Case, and a lower-case line
+    reads as something a person typed. These lines depend on that, since they
+    are questions rather than headlines.
+
+    `arm` is accepted and deliberately unused. Both arms take the same
+    subject; the signature keeps its shape so the six call sites do not need
+    to know that.
+    """
     prod = product_of(lab)
-    fill = lambda b: b.format(show=label, product=prod)
+    bank = SETB if prod else SETB_NOPROD
+    fill = lambda b: b.format(dom=dom, product=prod, single=SINGULAR.get(prod, prod))
+    # Base index from the COMPANY, stepped one along for the second person
+    # there, so the two never draw the same line.
     off = 0 if thread == 'A' else 1
-    out = fill(pick(bank, co, 's' + arm, off))
+    out = fill(pick(bank, co, 'sb', off))
     if len(out) <= 50:
         return out
-    # Ranking what fits and keeping the thread offset, rather than taking the
-    # single shortest, is what stops a long name putting both people at a
-    # company on one subject.
     fits = sorted((fill(b) for b in bank), key=len)
     return fits[off % len(fits)]
 
@@ -690,7 +722,7 @@ def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
@@ -703,7 +735,7 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -714,7 +746,7 @@ def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
@@ -727,7 +759,7 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -743,7 +775,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant,
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
@@ -771,7 +803,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab)
+        s1 = show_subject(variant, show, co, thread, lab, dom)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -843,7 +875,7 @@ COLS = ['email','first_name','last_name','company_name','website','contact_threa
         'segment_variant','send_day_1','send_day_2','send_day_3',
         'msg_subject_1a','msg_body_1a','msg_subject_1b','msg_body_1b',
         'msg_subject_2','msg_body_2','msg_subject_3','msg_body_3',
-        'studio_url','ab_arm','qa_show','qa_send_flag',
+        'studio_url','ab_arm','qa_show','qa_send_flag','qa_studio_match',
         'job_title','qa_decision_maker',
         'qa_tool_level','qa_has_tryon','qa_tool_name','qa_studio','qa_hook_quality','qa_hook',
         'qa_partner_email','qa_country','qa_size','qa_evidence']
@@ -958,7 +990,14 @@ for r in rows:
             # a QUALIFICATION result, not a copy problem, and it is the single
             # most useful filter in the file: hold these until someone decides
             # whether a company that sells no installed surface belongs here.
-            qa_send_flag=('send' if sk else 'HOLD no studio'),
+            # All 390 go out, decided 30 Sept. The HOLD recommendation stood
+            # for eight days and was overruled, which is the caller's to make.
+            # The information is not thrown away though: qa_studio_match still
+            # marks the 55 rows selling taps, radiators, doors and shower
+            # enclosures, so the filter is one sort away if the reply data
+            # makes the case.
+            qa_send_flag='send',
+            qa_studio_match=('matched' if sk else 'no studio'),
             job_title=(TITLES.get(email) or 'not enriched'),
             qa_decision_maker=decides(TITLES.get(email)),
             qa_tool_level=lvl, qa_has_tryon=tryon, qa_tool_name=tool, qa_studio=sk,
