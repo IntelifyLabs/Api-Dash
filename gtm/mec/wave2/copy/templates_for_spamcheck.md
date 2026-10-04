@@ -1,6 +1,6 @@
 # Every distinct template in the file, for a second opinion
 
-24 shapes across 306 sending rows. Personalisation is filled in from a real row, named under each heading, so what you paste is what lands in an inbox.
+24 shapes across 390 sending rows. Personalisation is filled in from a real row, named under each heading, so what you paste is what lands in an inbox.
 
 Paste each body with its subject into Mail Meteor, GlockApps or Mail Tester. `spam_audit.py` checks all 1560 emails; this file is here so a human can confirm the same set by hand.
 
@@ -8,7 +8,7 @@ Paste each body with its subject into Mail Meteor, GlockApps or Mail Tester. `sp
 
 Example row: AIP Porte
 
-**Subject:** who looks after aipporte.com?
+**Subject:** Who looks after aipporte.com?
 
 ```
 Hello Marco,
@@ -17,9 +17,9 @@ On your own site: "Progetta la tua porta interna".
 
 Every one of those arrives as words, and someone on your side has to turn it into a picture before anything moves.
 
-Showhouse sits on aipporte.com under your own branding, so nobody sees our name. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
+Showhouse sits on aipporte.com under your own branding. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
 
-The image only unlocks once they confirm their email. So you get a lead: the render, a short brief in their own words, and a verified address, all in one dashboard.
+The image unlocks once they confirm their email. So you capture a lead: the render, a short brief in their own words, and a verified address, together in one dashboard.
 
 Visitors also stay on the page instead of bouncing, and every render builds content around your own products.
 
@@ -27,7 +27,7 @@ We load your actual catalogue first, so nothing renders that you can't make. It 
 
 Try it on a photo of your own room: https://www.tryshowhouse.com
 
-Want one with AIP Porte products in it? Send me a collection name.
+Want one with AIP Porte products in it? Send me one of your collections.
 
 Regards,
 
@@ -39,7 +39,7 @@ Triminage
 
 Example row: Azzurra Ceramica
 
-**Subject:** who runs azzurraceramica.it?
+**Subject:** Furniture on azzurraceramica.it, one question
 
 ```
 Hello Mauro,
@@ -48,7 +48,7 @@ A quick one about azzurraceramica.it.
 
 Imagine a visitor leaves you their name, a photo of their own room with your product rendered into it, and a short brief saying what they were after. That is what lands in the dashboard, and the email is verified before the image unlocks.
 
-Showhouse is how they get there. It runs on your own domain under your branding, so nobody sees our name. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
+Showhouse is how they get there. It runs on your own domain under your branding. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
 
 We load your catalogue first, so nothing comes back in a finish you don't make, and the whole thing is live in weeks rather than quarters. Your logo, your colours, your domain.
 
@@ -66,7 +66,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** the tiles on 41zero42.com
+**Subject:** The tiles on 41zero42.com
 
 ```
 Hello Frederic,
@@ -75,9 +75,9 @@ Hello Frederic,
 
 What it can't do is show someone your product in the room they're standing in. So they look, decide, and go.
 
-Showhouse sits on 41zero42.com under your own branding, so nobody sees our name. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
+Showhouse sits on 41zero42.com under your own branding. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
 
-The image only unlocks once they confirm their email. So you get a lead: the render, a short brief in their own words, and a verified address, all in one dashboard.
+The image unlocks once they confirm their email. So you capture a lead: the render, a short brief in their own words, and a verified address, together in one dashboard.
 
 Visitors also stay on the page instead of bouncing, and every render builds content around your own products.
 
@@ -85,7 +85,7 @@ We load your actual catalogue first, so nothing renders that you can't make. It 
 
 Try it on a photo of your own room: https://www.tryshowhouse.com/tile
 
-Want one with 41Zero42 products in it? Send me a collection name.
+Want one with 41Zero42 products in it? Send me one of your collections.
 
 Regards,
 
@@ -97,7 +97,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** your tiles on 41zero42.com
+**Subject:** Your tiles on 41zero42.com
 
 ```
 Hello Filippo,
@@ -106,7 +106,7 @@ A quick one about 41zero42.com.
 
 Imagine a visitor leaves you their name, a photo of their own room with your product rendered into it, and a short brief saying what they were after. That is what lands in the dashboard, and the email is verified before the image unlocks.
 
-Showhouse is how they get there. It runs on your own domain under your branding, so nobody sees our name. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
+Showhouse is how they get there. It runs on your own domain under your branding. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
 
 We load your catalogue first, so nothing comes back in a finish you don't make, and the whole thing is live in weeks rather than quarters. Your logo, your colours, your domain.
 
@@ -124,7 +124,7 @@ Triminage
 
 Example row: Aparici
 
-**Subject:** your tiles on aparici.com
+**Subject:** Tiles on aparici.com, one question
 
 ```
 Hello Juan,
@@ -133,9 +133,9 @@ You already run 3D Viewer, so someone can see your products in a room. Most of t
 
 What it doesn't do is tell you who they were. They render, they like it, and they leave with no name attached.
 
-Showhouse sits on aparici.com under your own branding, so nobody sees our name. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
+Showhouse sits on aparici.com under your own branding. A visitor photographs their room and your product appears in it. Or they describe what they're imagining and it's generated from your real collections and finishes.
 
-The image only unlocks once they confirm their email. So you get a lead: the render, a short brief in their own words, and a verified address, all in one dashboard.
+The image unlocks once they confirm their email. So you capture a lead: the render, a short brief in their own words, and a verified address, together in one dashboard.
 
 Visitors also stay on the page instead of bouncing, and every render builds content around your own products.
 
@@ -143,7 +143,7 @@ We load your actual catalogue first, so nothing renders that you can't make. It 
 
 Try it on a photo of your own room: https://www.tryshowhouse.com/tile
 
-Want one with Aparici products in it? Send me a collection name.
+Want one with Aparici products in it? Send me one of your collections.
 
 Regards,
 
@@ -155,7 +155,7 @@ Triminage
 
 Example row: Argenta Ceramica
 
-**Subject:** the tiles on argentaceramica.com
+**Subject:** Who looks after argentaceramica.com?
 
 ```
 Hello David,
@@ -164,7 +164,7 @@ A quick one about argentaceramica.com.
 
 Imagine a visitor leaves you their name, a photo of their own room with your product rendered into it, and a short brief saying what they were after. That is what lands in the dashboard, and the email is verified before the image unlocks.
 
-Showhouse is how they get there. It runs on your own domain under your branding, so nobody sees our name. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
+Showhouse is how they get there. It runs on your own domain under your branding. They photograph a room and your product appears in it, or they describe what they're picturing and it's generated from your real collections.
 
 We load your catalogue first, so nothing comes back in a finish you don't make, and the whole thing is live in weeks rather than quarters. Your logo, your colours, your domain.
 
@@ -182,7 +182,7 @@ Triminage
 
 Example row: AIP Porte
 
-**Subject:** who looks after aipporte.com?
+**Subject:** Who looks after aipporte.com?
 
 ```
 Hello Marco,
@@ -195,7 +195,7 @@ Every sample you post costs you something, and most of them go to people who wer
 
 Showhouse puts the decision before the sample. On aipporte.com, under your own branding, a visitor photographs their room and sees your product in it, or describes what they want and gets it generated from your real collections.
 
-They confirm an email to keep the image. You get the render, a brief in their words and a verified address in one dashboard, so you know who's serious before anything ships.
+They confirm an email to keep the image. You capture the render, a brief in their words and a verified address together in one dashboard, so you know who's serious before anything ships.
 
 Your own catalogue goes in first, so nothing renders that you don't make. Live in weeks.
 
@@ -213,7 +213,7 @@ Triminage
 
 Example row: Azzurra Ceramica
 
-**Subject:** who runs azzurraceramica.it?
+**Subject:** Furniture on azzurraceramica.it, one question
 
 ```
 Hello Mauro,
@@ -242,7 +242,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** the tiles on 41zero42.com
+**Subject:** The tiles on 41zero42.com
 
 ```
 Hello Frederic,
@@ -255,7 +255,7 @@ Every sample you post costs you something, and most of them go to people who wer
 
 Showhouse puts the decision before the sample. On 41zero42.com, under your own branding, a visitor photographs their room and sees your product in it, or describes what they want and gets it generated from your real collections.
 
-They confirm an email to keep the image. You get the render, a brief in their words and a verified address in one dashboard, so you know who's serious before anything ships.
+They confirm an email to keep the image. You capture the render, a brief in their words and a verified address together in one dashboard, so you know who's serious before anything ships.
 
 Your own catalogue goes in first, so nothing renders that you don't make. Live in weeks.
 
@@ -273,7 +273,7 @@ Triminage
 
 Example row: 41Zero42
 
-**Subject:** your tiles on 41zero42.com
+**Subject:** Your tiles on 41zero42.com
 
 ```
 Hello Filippo,
@@ -302,7 +302,7 @@ Triminage
 
 Example row: Aparici
 
-**Subject:** your tiles on aparici.com
+**Subject:** Tiles on aparici.com, one question
 
 ```
 Hello Juan,
@@ -315,7 +315,7 @@ Every sample you post costs you something, and most of them go to people who wer
 
 Showhouse puts the decision before the sample. On aparici.com, under your own branding, a visitor photographs their room and sees your product in it, or describes what they want and gets it generated from your real collections.
 
-They confirm an email to keep the image. You get the render, a brief in their words and a verified address in one dashboard, so you know who's serious before anything ships.
+They confirm an email to keep the image. You capture the render, a brief in their words and a verified address together in one dashboard, so you know who's serious before anything ships.
 
 Your own catalogue goes in first, so nothing renders that you don't make. Live in weeks.
 
@@ -333,7 +333,7 @@ Triminage
 
 Example row: Argenta Ceramica
 
-**Subject:** the tiles on argentaceramica.com
+**Subject:** Who looks after argentaceramica.com?
 
 ```
 Hello David,

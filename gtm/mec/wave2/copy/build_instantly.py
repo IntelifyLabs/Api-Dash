@@ -172,7 +172,11 @@ def titlecase_company(c):
     # merge field, and the spaced hyphen is the one dash the copy rules do
     # not allow. In both cases the first segment is the brand the domain
     # belongs to, so that is the one the email should use.
-    c = re.split(r'\s+[-–—/]\s+', c)[0].strip() or c
+    # The separator does not always have a space before it: "Andean Stone
+    # Company- Simpatico Surfaces" is one real row, and now that the company
+    # name goes into the subject line a 40 character name is a visible
+    # problem rather than a cosmetic one.
+    c = re.split(r'\s*[-–—/]\s+', c)[0].strip() or c
     # Three names carry a directory descriptor after the brand: "JADRANKAMEN
     # white limestone Croatia/EU", "Images In Tile USA, Inc. dba Bison Coating
     # & Supply", and a German one running to "GmbH & Co. KG". Written into a
@@ -576,45 +580,84 @@ def product_of(lab):
     frames. Those still read specific, because the domain is theirs."""
     return PRODUCT.get(lab, '')
 
-# Every frame but one carries the domain, so almost every row gets a subject
-# nobody else on the list receives: 337 distinct lines across 390 rows, the
-# largest share 7 per cent. The previous set ran 11 lines at 19 per cent, and
-# near-identical phrasing across a segment was copy defect four on campaign 2.
-SETB = ['a question about {dom}',
-        'quick question about {dom}',
-        'who runs {dom}?',
-        'who handles {dom}?',
-        'who looks after {dom}?',
-        'the {product} on {dom}',
-        'your {product} on {dom}',
-        '{product} on {dom}, one question',
-        'the {single} enquiries you never get']
+# Revised 4 Oct on Abdullah's review. Two frames of his are added, and both
+# name the COMPANY rather than the domain:
+#
+#     A question about {co}
+#     We noticed something on {co}
+#
+# SENTENCE CASE from here. The bank was lower case on the argument that a
+# lower-case line reads as hand-typed rather than as a newsletter. That holds
+# for a US tech inbox and does not transfer to this list: 264 of 390 sit in
+# Italy or Spain reading English as a second language, where the affectation
+# reads careless instead of casual. Both reviewers wrote their suggestions
+# capitalised, which is the same instinct. Domains stay lower case, because
+# that is what a domain is.
+#
+# ROUTED, NOT FLAT. "We noticed something" promises a specific observation, so
+# it only goes to rows where there IS one. Applied to all 390 it would be a
+# bluff on the 163 that have nothing but a catalogue, and a reader who opens
+# on that promise and finds a generic first line deletes harder than one who
+# never opened. Three tiers carry a real observation:
+#
+#     80 rows  qa_has_tryon = yes      they run a visualiser and never learn who used it
+#     37 rows  qa_tool_level = MANUAL  somebody makes the mock-ups by hand
+#     45 rows  their own site quote    the site invites the visitor to choose, and records nothing
+#
+# Those are the 162 rows that get the insight frames. The quotes are the best
+# material in the campaign because they are the prospect's own sentence:
+# "See products in your room", "Scegli il tuo stile", "The ceramics you choose
+# in the space you want". The remaining 163 draw from the neutral frames,
+# which are specific anyway because they carry the domain.
+INSIGHT = ['A question about {co}',
+           'We noticed something on {co}']
+
+NEUTRAL = ['A question about {dom}',
+           'Quick question about {dom}',
+           'Who runs {dom}?',
+           'Who handles {dom}?',
+           'Who looks after {dom}?',
+           'The {product} on {dom}',
+           'Your {product} on {dom}',
+           '{Product} on {dom}, one question',
+           'The {single} enquiries you never get']
+
 # The 55 rows selling taps, radiators, doors and shower enclosures have no
 # product word, so they drop the four frames that need one.
-SETB_NOPROD = [b for b in SETB if '{product}' not in b and '{single}' not in b] + \
-              ['the enquiries {dom} never gets']
+NEUTRAL_NOPROD = [b for b in NEUTRAL if '{product}' not in b and '{single}' not in b] + \
+                 ['The enquiries {dom} never gets']
 
-def show_subject(arm, show, co, thread, lab='', dom=''):
-    """Lower case on purpose.
+def has_insight(tryon, lvl, hook):
+    """True where the email can actually name what we noticed."""
+    return tryon == 'yes' or lvl == 'MANUAL' or bool(hook)
 
-    The earlier rule was that a lower-case subject reads as a newsletter. That
-    was backwards: newsletters arrive in Title Case, and a lower-case line
-    reads as something a person typed. These lines depend on that, since they
-    are questions rather than headlines.
+def show_subject(arm, show, co, thread, lab='', dom='', tryon='', lvl='', hook=''):
+    """One bank, both arms.
 
-    `arm` is accepted and deliberately unused. Both arms take the same
-    subject; the signature keeps its shape so the six call sites do not need
-    to know that.
+    `arm` is accepted and deliberately unused. Message 1 is an A/B on the
+    BODY, revenue side against cost side, so the subject is held constant
+    across the two. Splitting the subject as well would move two variables at
+    once, and at 390 contacts neither difference would reach a readable
+    margin. Better to put the strongest line on every row than to post half
+    the list a line we think is weaker.
     """
     prod = product_of(lab)
-    bank = SETB if prod else SETB_NOPROD
-    fill = lambda b: b.format(dom=dom, product=prod, single=SINGULAR.get(prod, prod))
+    bank = list(NEUTRAL if prod else NEUTRAL_NOPROD)
+    if has_insight(tryon, lvl, hook):
+        bank += INSIGHT
+    fill = lambda b: b.format(dom=dom, product=prod, co=co,
+                              Product=prod[:1].upper() + prod[1:],
+                              single=SINGULAR.get(prod, prod))
     # Base index from the COMPANY, stepped one along for the second person
     # there, so the two never draw the same line.
     off = 0 if thread == 'A' else 1
     out = fill(pick(bank, co, 'sb', off))
     if len(out) <= 50:
         return out
+    # A company name runs to 40 characters where a domain stops at 29, so the
+    # two {co} frames overflow on a handful of rows. Rank what fits and keep
+    # the thread offset rather than taking the single shortest, which would
+    # put both people at a company on one line.
     fits = sorted((fill(b) for b in bank), key=len)
     return fits[off % len(fits)]
 
@@ -656,28 +699,28 @@ def msg1(arm, thread, seg, f, co, dom, tool, hook, basic, url, partner):
     if thread == 'A':
         top = hook1(seg, co, dom, tool, hook, basic)
         if arm == 'R':
-            mid = (f"Showhouse sits on {dom} under your own branding, so nobody sees our name. "
+            mid = (f"Showhouse sits on {dom} under your own branding. "
                    f"A visitor photographs their room and your product appears in it. Or they "
                    f"describe what they're imagining and it's generated from your real "
                    f"collections and finishes.\n\n"
-                   f"The image only unlocks once they confirm their email. So you get a lead: "
-                   f"the render, a short brief in their own words, and a verified address, all "
-                   f"in one dashboard.\n\n"
+                   f"The image unlocks once they confirm their email. So you capture a lead: "
+                   f"the render, a short brief in their own words, and a verified address, "
+                   f"together in one dashboard.\n\n"
                    f"Visitors also stay on the page instead of bouncing, and every render "
                    f"builds content around your own products.\n\n"
                    f"We load your actual catalogue first, so nothing renders that you can't "
                    f"make. It goes live in weeks.")
             cta = (f"Try it on a photo of your own room: {url}\n\n"
-                   f"Want one with {co} products in it? Send me a collection name.")
+                   f"Want one with {co} products in it? Send me one of your collections.")
         else:
             mid = (f"Every sample you post costs you something, and most of them go to people "
                    f"who were never going to order.\n\n"
                    f"Showhouse puts the decision before the sample. On {dom}, under your own "
                    f"branding, a visitor photographs their room and sees your product in it, or "
                    f"describes what they want and gets it generated from your real collections.\n\n"
-                   f"They confirm an email to keep the image. You get the render, a brief in "
-                   f"their words and a verified address in one dashboard, so you know who's "
-                   f"serious before anything ships.\n\n"
+                   f"They confirm an email to keep the image. You capture the render, a brief in "
+                   f"their words and a verified address together in one dashboard, so you "
+                   f"know who's serious before anything ships.\n\n"
                    f"Your own catalogue goes in first, so nothing renders that you don't make. "
                    f"Live in weeks.")
             cta = (f"Have a go on your own room photo: {url}\n\n"
@@ -697,7 +740,7 @@ def msg1(arm, thread, seg, f, co, dom, tool, hook, basic, url, partner):
                 f"That is what lands in the dashboard, and the email is verified before the "
                 f"image unlocks.\n\n"
                 f"Showhouse is how they get there. It runs on your own domain under your "
-                f"branding, so nobody sees our name. They photograph a room and your product "
+                f"branding. They photograph a room and your product "
                 f"appears in it, or they describe what they're picturing and it's generated "
                 f"from your real collections.\n\n"
                 f"We load your catalogue first, so nothing comes back in a finish you don't "
@@ -722,7 +765,7 @@ def variant_C(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     """Already runs a visualiser. Never suggest they lack one."""
     t = tool or 'your room visualiser'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'C')
         b3 = f"""Hello {f},
@@ -735,7 +778,7 @@ Have a look and judge it yourself: {url}
 
 And if it's a no, just say no. I'll leave you be."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'C', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -746,7 +789,7 @@ def variant_A(f, co, dom, tool, hook, thread, partner, url, lab, variant, show='
     line = f'On your own site: "{hook}".' if hook else \
            f'{co} sells bespoke work, and the way in is to contact your team.'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _a2(f, co, url, 'A')
         b3 = f"""Hello {f},
@@ -759,7 +802,7 @@ Have a look and see what you think: {url}
 
 If it's a no, say so and I'll leave you alone."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'A', f, co, dom, tool, hook, False, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -775,7 +818,7 @@ def variant_B(f, co, dom, tool, hook, thread, partner, basic, url, lab, variant,
     else:
         line = f'{dom} shows the collections well, and then the visit ends at a catalogue.'
     if thread == 'A':
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _a2(f, co, url, 'B')
         # Two objections, split by row. One body was going to 139 addresses,
@@ -803,7 +846,7 @@ Have a look at the studio first and see if it's even worth the conversation: {ur
 
 And if it isn't, tell me and I'll stop."""
     else:
-        s1 = show_subject(variant, show, co, thread, lab, dom)
+        s1 = show_subject(variant, show, co, thread, lab, dom, tryon, lvl, hook)
         b1 = msg1(variant, thread, 'B', f, co, dom, tool, hook, basic, url, partner)
         b2 = _b2(f, url, partner)
         b3 = _b3(f, dom, url, co)
@@ -918,7 +961,13 @@ for r in rows:
     sk  = studio_key(r['Use AI Product Category'], r['niche'], r['Description'])
     show = show_key(r.get('source'))
     hall = hall_of(r.get('stand'))
-    path, lab = STUDIO.get(sk, ('', 'Mosaic Studio'))
+    # The fallback label used to be 'Mosaic Studio', which was harmless while
+    # lab went nowhere near the copy. It stopped being harmless the moment the
+    # subject line started naming the product: the 55 rows selling taps,
+    # radiators and doors were being told "mosaics on aipporte.com". lab is
+    # never interpolated into a body, so a blank is correct and those rows now
+    # take the frames that need no product word.
+    path, lab = STUDIO.get(sk, ('', ''))
     url = BASE + path
 
     people = []

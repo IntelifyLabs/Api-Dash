@@ -192,13 +192,13 @@ def main():
     pack.sort()
     with open('templates_for_spamcheck.md', 'w') as fh:
         fh.write('# Every distinct template in the file, for a second opinion\n\n')
-        fh.write('%d shapes across 306 sending rows. Personalisation is filled in '
+        fh.write('%d shapes across %d sending rows. Personalisation is filled in '
                  'from a real row, named under each heading, so what you paste is '
                  'what lands in an inbox.\n\n'
                  'Paste each body with its subject into Mail Meteor, GlockApps or '
                  'Mail Tester. `spam_audit.py` checks all %d emails; this file is '
                  'here so a human can confirm the same set by hand.\n\n'
-                 % (len(pack), len(send) * 4))
+                 % (len(pack), len(send), len(send) * 4))
         for (name, seg, thread), co, subj, body in pack:
             fh.write('## Message %s, segment %s, thread %s\n\n' % (name, seg, thread))
             fh.write('Example row: %s\n\n**Subject:** %s\n\n```\n%s\n```\n\n' % (co, subj, body))
