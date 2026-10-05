@@ -33,17 +33,31 @@ HALL VERDICTS, from the 1,096 exhibitor listing on 5 Oct.
   eye, all engineered or branded surface houses that do market to end buyers,
   and they are kept by name rather than by hall.
 
-  IN, still to be pasted: halls 8, 6, 10, 11, 12, 4, 3, 1 and the Areas and
-  Avenues. 880 companies. Hall 1 is "A Matter of Stone", the finished-product
-  and design showcase, and is the highest-value 28 rows at the fair.
+  Hall 1, 28, is the BRAZIL PAVILION and is out. Not what I predicted: a
+  Stone World piece on an earlier edition put "A Matter of Stone" there and I
+  repeated it, so it went into the plan as the densest 28 rows at the fair.
+  The paste says otherwise. All 28 are granite and marble houses from Espirito
+  Santo, two of them openly mineracao, mining, and several comercio,
+  importacao e exportacao. Fourteen share stands 10 and 10-11, which is a
+  national collective booth rather than 14 brands. Same profile as hall 9:
+  slab and block exporters selling B2B to fabricators, no consumer site.
+
+  LESSON, and it cost a wrong recommendation. Hall contents cannot be
+  predicted from a press article about a previous edition. The pasted listing
+  is the only evidence, so no hall gets a verdict here until it has been seen.
+
+  Still to be pasted: halls 8 (197), 6 (112), 10 (98), 11 (79), 12 (76),
+  4 (40), 3 (30), Area B (41), Area D (23), Avenue E (23), Area A (20) and
+  the five small ones. 731 companies, none of them predicted.
 """
 import csv, re, sys, collections
 
-HALL_OUT = {'7', '2', '5'}
+HALL_OUT = {'7', '2', '5', '1'}
 HALL_OUT_WHY = {
     '7': 'diamond tools, abrasives, resins and chemicals',
     '2': 'machinery, metalwork, waterjet and robotics',
     '5': 'sawing, polishing and handling machinery, CAD and surveying',
+    '1': 'Brazil pavilion: granite and marble block and slab exporters',
 }
 # Hall 9 is quarries and block traders, out as a hall. These three are kept by
 # name: engineered or branded surface houses with consumer-facing marketing.
