@@ -46,18 +46,35 @@ HALL VERDICTS, from the 1,096 exhibitor listing on 5 Oct.
   predicted from a press article about a previous edition. The pasted listing
   is the only evidence, so no hall gets a verdict here until it has been seen.
 
-  Still to be pasted: halls 8 (197), 6 (112), 10 (98), 11 (79), 12 (76),
-  4 (40), 3 (30), Area B (41), Area D (23), Avenue E (23), Area A (20) and
-  the five small ones. 731 companies, none of them predicted.
+  Hall 8, 197, is the CHINA PAVILION and is out. The single largest block at
+  the fair, 18% of it, and every row is China or Hong Kong. Roughly 40 diamond
+  tool and superabrasive makers, 20 machinery builders, 40-odd "Imp & Exp"
+  trading houses, and stone processors selling slabs to importers. Strays
+  include a lighting company, a textile importer, a fiberglass maker, a
+  refractories corp and four exhibition organisers. Two quartz surface names,
+  Mayhern and Vemy, are the only arguable rows and both read as OEM slab
+  suppliers rather than brands a shopper meets, so the hall is out whole.
+
+  WHERE THAT LEAVES IT. 562 of 1,096 excluded, 51% of the fair, and not one
+  prospect found yet. Marmomac is looking like a SUPPLY CHAIN fair rather than
+  a brand fair: quarries, processors, tool makers, machinery builders and
+  traders. The companies this campaign needs are the branded surface houses
+  that run a consumer website, and whether they exhibit here at all is now the
+  question that decides if the remaining 534 rows are worth pasting.
+
+  Still to be pasted: halls 6 (112), 10 (98), 11 (79), 12 (76), Area B (41),
+  4 (40), 3 (30), Area D (23), Avenue E (23), Area A (20) and the five small
+  ones. 534 companies. No hall is predicted; each gets a verdict when seen.
 """
 import csv, re, sys, collections
 
-HALL_OUT = {'7', '2', '5', '1'}
+HALL_OUT = {'7', '2', '5', '1', '8'}
 HALL_OUT_WHY = {
     '7': 'diamond tools, abrasives, resins and chemicals',
     '2': 'machinery, metalwork, waterjet and robotics',
     '5': 'sawing, polishing and handling machinery, CAD and surveying',
     '1': 'Brazil pavilion: granite and marble block and slab exporters',
+    '8': 'China pavilion: diamond tools, machinery and import-export houses',
 }
 # Hall 9 is quarries and block traders, out as a hall. These three are kept by
 # name: engineered or branded surface houses with consumer-facing marketing.
