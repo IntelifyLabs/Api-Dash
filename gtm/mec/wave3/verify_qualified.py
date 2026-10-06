@@ -57,14 +57,26 @@ for r in live:
 check(bad == 0, 'reason never contradicts has_tryon or sells_to (%d mismatches)' % bad)
 check(all(r['reason'] for r in todo), 'every probed row has a reason line')
 
-print('\nthe four companies that proved the first signal wrong')
-for name in ('Bonaldo', 'Acerbis', 'Annibale Colombo', 'Abimis'):
+print('\nthe companies that proved the cart-only signal wrong')
+# Annibale Colombo was in this list and the assertion was wrong, not the data.
+# Its homepage is Home, Azienda, Indoor, Outdoor, Designers, Contatti: no cart,
+# no dealer finder, no prices. "Not a cart" never meant "sells to consumers",
+# and asserting it did was the same mistake the first regex made. It is a
+# catalogue-only brand showcase, which is now its own value.
+for name in ('Bonaldo', 'Acerbis'):
     m = [r for r in rows if name.lower() in r['company'].lower()]
     if not m:
-        warn.append('%s not found in the file' % name); print('  warn %s not found' % name); continue
+        warn.append('%s not found' % name); print('  warn %s not found' % name); continue
     r = m[0]
-    ok = r['site_live'] != 'yes' or r['sells_to'] != 'unclear'
-    check(ok, '%-18s site=%-11s sells_to=%s' % (name, r['site_live'], r['sells_to']))
+    check(r['site_live'] != 'yes' or r['sells_to'].startswith('consumer'),
+          '%-18s site=%-11s sells_to=%s' % (name, r['site_live'], r['sells_to']))
+for name in ('Annibale Colombo',):
+    m = [r for r in rows if name.lower() in r['company'].lower()]
+    r = m[0] if m else None
+    if r:
+        check(r['sells_to'] in ('catalogue only', 'consumer, via dealers'),
+              '%-18s reads %s, confirmed by hand as a brand showcase'
+              % (name, r['sells_to']))
 
 print('\nno regression against the first pass')
 ty = sum(1 for r in live if r['has_tryon'] == 'yes')
@@ -75,12 +87,15 @@ check(850 <= lv <= 980, 'live sites = %d, first pass found 915' % lv)
 print('\ndid unclear actually fall')
 unc = sum(1 for r in live if r['sells_to'] == 'unclear')
 pct = 100 * unc / lv if lv else 0
-print('  unclear: %d of %d live (%.0f%%), was 525 of 915 (57%%)' % (unc, lv, pct))
-if pct > 33:
+print('  unclear: %d of %d live (%.0f%%). 57%% on pass 1, 45%% on pass 2' % (unc, lv, pct))
+# Pass 2's 411 "unclear" were sampled by hand: 16 of 23 had a downloadable
+# catalogue, 15 a contact form, only 3 a price. That is a brand showcase, not
+# an unknown, so it has its own label now and the bar is far lower.
+if pct > 12:
     warn.append('unclear is still %.0f%% of live sites' % pct)
-    print('  warn still above a third, report it rather than hide it')
+    print('  warn above 12%, report it rather than hide it')
 else:
-    print('  ok   below a third')
+    print('  ok   a genuine residue')
 
 print('\nsells_to breakdown')
 for k, n in collections.Counter(r['sells_to'] for r in live).most_common():

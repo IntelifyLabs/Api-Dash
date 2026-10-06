@@ -54,6 +54,32 @@ DEALER = re.compile(
     r'h.ndler ?suche|fachh.ndler|distribuidor|revendedor|point de vente|'
     r'revendeur|verkooppunt|showroom locator', re.I)
 
+# The 411 that came back "unclear" were not unclear. Sampling 23 of them
+# found 16 with a downloadable catalogue, 15 with a contact form, 9 publishing
+# collections, and only 3 showing a price. Annibale Colombo is the type: Home,
+# Azienda, Indoor, Outdoor, Designers, Contatti. No cart, no dealer finder, no
+# prices anywhere.
+#
+# That is a BRAND SHOWCASE, and it is the exact shape the campaign body opens
+# on: "your site shows the collections well, and then the visit ends at a
+# catalogue". Labelling it unclear buried the segment the copy was written for.
+#
+# One honesty caveat kept in the label: a homepage cannot tell you whether
+# those visitors are homeowners or architects. The shape is certain, the
+# audience is not, so the value says catalogue only rather than consumer.
+CATALOGUE = re.compile(
+    r'\bcatalog(ue|o|ues|s)?\b|katalog|\bcollection(s)?\b|collezion|kollektion|'
+    r'coleccion|cole..o|\bdownload', re.I)
+CONTACTABLE = re.compile(
+    r'\bcontact\b|contatt|kontakt|contacto|contato|request (a )?(quote|information)|'
+    r'richiedi informazioni|\bnewsletter\b|\benquir|\binquir', re.I)
+# A reserved area or dealer login with no cart and no public locator means the
+# shopper journey is gated, so the visitor is a dealer, not a buyer.
+GATED = re.compile(
+    r'\b(dealer|reseller|retailer|partner|b2b)\s*(login|log in|area|portal|zone)|'
+    r'area riservat|reserved area|\bmy ?account\b.{0,40}(dealer|reseller)|'
+    r'bereich f.r h.ndler|espace revendeur', re.I)
+
 TRADE = re.compile(
     r'trade only|to the trade\b|wholesale (only|enquir|inquir)|dealer (login|portal|area)|'
     r'reseller (login|portal)|b2b (portal|only|login)|retailer (login|area)|'
@@ -111,12 +137,16 @@ def probe(r):
     out['has_tryon'] = 'yes' if TRYON.search(body) else 'no'
     shop, dealer, trade = (bool(CONSUMER.search(body)), bool(DEALER.search(body)),
                            bool(TRADE.search(body)))
+    gated = bool(GATED.search(body))
+    showcase = bool(CATALOGUE.search(body)) and bool(CONTACTABLE.search(body))
     if shop:
         out['sells_to'] = 'consumer, sells online'
     elif dealer:
         out['sells_to'] = 'consumer, via dealers'
-    elif trade:
-        out['sells_to'] = 'trade only'
+    elif trade or gated:
+        out['sells_to'] = 'trade portal, gated'
+    elif showcase:
+        out['sells_to'] = 'catalogue only'
     else:
         out['sells_to'] = 'unclear'
     q = QUOTE_META.search(body) or QUOTE_H1.search(body)
@@ -137,18 +167,24 @@ def reason(r):
     sells = r['sells_to']
     who = {'consumer, sells online': 'sells direct to shoppers',
            'consumer, via dealers': 'markets to shoppers and routes them to dealers',
-           'trade only': 'sells only to the trade',
-           'unclear': 'no clear shopper journey found'}[sells]
+           'trade portal, gated': 'gates its catalogue behind a dealer login',
+           'catalogue only': 'publishes collections and a catalogue with a contact form '
+                             'as the only way in',
+           'unclear': 'no catalogue, cart or contact route found'}[sells]
     if tryon and sells.startswith('consumer'):
         return ('Already runs a visualiser and %s, so the gap is what happens '
                 'after the render. Sharpest segment' % who)
     if tryon:
         return ('Already runs a visualiser but %s, so confirm there is a '
                 'shopper to capture' % who)
-    if sells == 'trade only':
-        return 'Sells only to the trade, so there is no shopper for the engine to capture'
+    if sells == 'trade portal, gated':
+        return ('Catalogue sits behind a dealer login, so the visitor is a dealer '
+                'rather than a buyer')
+    if sells == 'catalogue only':
+        return ('Publishes collections with a contact form as the only way in, which '
+                'is the exact problem the email opens on. Audience unconfirmed')
     if sells == 'unclear':
-        return 'Live site but no cart, dealer locator or trade signal found, needs a look'
+        return 'Live site but no catalogue, cart or contact route found, needs a look'
     return 'No visualiser yet and %s, so this is the full pitch rather than an upgrade' % who
 
 if __name__ == '__main__':
