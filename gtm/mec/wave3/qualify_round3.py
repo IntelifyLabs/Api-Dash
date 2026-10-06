@@ -73,12 +73,33 @@ CATALOGUE = re.compile(
 CONTACTABLE = re.compile(
     r'\bcontact\b|contatt|kontakt|contacto|contato|request (a )?(quote|information)|'
     r'richiedi informazioni|\bnewsletter\b|\benquir|\binquir', re.I)
-# A reserved area or dealer login with no cart and no public locator means the
-# shopper journey is gated, so the visitor is a dealer, not a buyer.
+# A dealer login with no cart and no public locator means the shopper journey
+# is gated, so the visitor is a dealer, not a buyer.
+#
+# Pass 3 shipped this with a bare `area riservat|reserved area` alternative and
+# it was wrong on 30 of the 42 rows it labelled. Annibale Colombo caught it: its
+# footer reads "Area riservata | Modelli 3D", a link to a 3D-model download
+# portal sitting between an Instagram icon and a newsletter form. In Italian
+# `area riservata` is the ordinary label for ANY login-protected resource area
+# -- press kits, CAD files, downloads, a plain customer account. It says a login
+# exists. It does not say who it is for, and it does not say the shopper journey
+# is gated. Reading it as trade-only is the same mistake as reading a nav-bar
+# "Visualizer" as a product feature: a word in the chrome taken for a fact about
+# the funnel.
+#
+# So the reserved-area wording now only counts when a trade word sits within 120
+# characters of it. That keeps the rows where it means what it says -- Target
+# Point's "Area riservata agenti", Ceramica Cielo -- and drops the 30 brand
+# showcases that merely have a download login, which fall through to the
+# catalogue-only / unclear branches where they belong.
 GATED = re.compile(
     r'\b(dealer|reseller|retailer|partner|b2b)\s*(login|log in|area|portal|zone)|'
-    r'area riservat|reserved area|\bmy ?account\b.{0,40}(dealer|reseller)|'
-    r'bereich f.r h.ndler|espace revendeur', re.I)
+    r'\bmy ?account\b.{0,40}(dealer|reseller)|'
+    r'bereich f.r h.ndler|espace revendeur|'
+    r'(?:area riservat|reserved area)[\s\S]{0,120}?'
+    r'(rivendit|agent|dealer|reseller|retailer|grossist|wholesal|b2b)|'
+    r'(rivendit|agent|dealer|reseller|retailer|grossist|wholesal|b2b)'
+    r'[\s\S]{0,120}?(?:area riservat|reserved area)', re.I)
 
 TRADE = re.compile(
     r'trade only|to the trade\b|wholesale (only|enquir|inquir)|dealer (login|portal|area)|'
