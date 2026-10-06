@@ -45,9 +45,14 @@ bad('%d NONE rows carry evidence' % len(ev_on_none)) if ev_on_none \
     else ok('no NONE row carries evidence')
 
 print('\nsegment recomputed independently, must agree exactly')
-mis = [r for r in ROWS if r['segment'] != (
-    '' if r['site_live'] != 'yes' and not r['tool_level'] else
-    ('C' if r['has_tryon'] == 'yes' else 'A' if r['tool_level'] == 'MANUAL' else 'B'))]
+# A row with no tool_level was never read, so it has no segment. That is a
+# legitimate blank, distinct from a formula disagreement, and conflating the two
+# made this check report 69 false failures on the first run.
+def expect(r):
+    if not r['tool_level']:
+        return ''
+    return 'C' if r['has_tryon'] == 'yes' else 'A' if r['tool_level'] == 'MANUAL' else 'B'
+mis = [r for r in ROWS if r['segment'] != expect(r)]
 if mis:
     bad('%d rows disagree with the wave-2 segment formula, e.g. %s' %
         (len(mis), [(r['company'][:20], r['has_tryon'], r['tool_level'], r['segment'])
@@ -61,12 +66,16 @@ print('\nhas_tryon now means a room visualiser and nothing else')
 # visualiser". Gate 5 redefines it as exactly tool_level ADVANCED. That identity
 # is the contract, so it is asserted rather than described.
 bad_yes = [r for r in live if r['has_tryon'] == 'yes' and r['tool_level'] != 'ADVANCED']
+unread = [r for r in live if not r['tool_level']]
 bad_no = [r for r in live if r['has_tryon'] != 'yes' and r['tool_level'] == 'ADVANCED']
 if bad_yes or bad_no:
     bad('has_tryon no longer equals ADVANCED: %d yes-but-not-ADVANCED, '
         '%d ADVANCED-but-not-yes' % (len(bad_yes), len(bad_no)))
 else:
     ok('has_tryon == (tool_level ADVANCED) on every live row')
+if unread:
+    print('         %d live rows gate 5 could not read carry no claim either way'
+          % len(unread))
 nvis = sum(1 for r in live if r['has_tryon'] == 'yes')
 print('         %d live rows run a real visualiser (gate 4 had claimed 93)' % nvis)
 

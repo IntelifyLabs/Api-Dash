@@ -172,8 +172,16 @@ def evidence(m, body, n=150):
     return out or strip(m.group(0))[:190]
 
 def probe(r):
+    # has_tryon is blanked here, not left alone, and that matters on the early
+    # returns below. Gate 4's value for it is known-unreliable -- it counted
+    # configurators as visualisers -- so a row gate 5 cannot read must not keep
+    # gate 4's answer. Two rows did: PLA.NET and Scarabeo Ceramiche came out
+    # has_tryon=yes with no tool_level behind it, which is exactly the
+    # unjustifiable claim the redefinition was meant to remove. Blank means
+    # nobody has established it, which is the truth for these rows.
     out = {'tool_level': '', 'tool_name': '', 'tool_evidence': '',
-           'business_role': '', 'product_type': '', 'site_matches': '', 'segment': ''}
+           'business_role': '', 'product_type': '', 'site_matches': '',
+           'segment': '', 'has_tryon': ''}
     site = (r['website'] or '').strip()
     if not site or r['site_live'] != 'yes':
         return out

@@ -79,8 +79,22 @@ for name in ('Annibale Colombo',):
               % (name, r['sells_to']))
 
 print('\nno regression against the first pass')
+# This used to assert 70 <= has_tryon <= 130, guarding the 94 gate 4 first
+# found. That band is now wrong on purpose. Gate 4's TRYON regex carries a bare
+# `configurator` alternative, and 54 of those 94 had matched the single word
+# "configurator" -- a finish picker, not a room visualiser -- while the reason
+# line told the reader "Already runs a visualiser". Gate 5 redefines the column
+# as exactly tool_level ADVANCED, so the honest number is much smaller and the
+# check is now the identity itself rather than a band around the old mistake.
 ty = sum(1 for r in live if r['has_tryon'] == 'yes')
-check(70 <= ty <= 130, 'has_tryon = %d, first pass found 94' % ty)
+adv = sum(1 for r in live if r.get('tool_level') == 'ADVANCED')
+if 'tool_level' in (live[0].keys() if live else ()):
+    check(ty == adv, 'has_tryon = %d, equals the ADVANCED count (%d). The 94 the '
+                     'first pass reported counted configurators as visualisers'
+                     % (ty, adv))
+else:
+    check(70 <= ty <= 130, 'has_tryon = %d, gate 5 has not run yet so the old '
+                           'configurator-inflated band still applies' % ty)
 lv = len(live)
 check(850 <= lv <= 980, 'live sites = %d, first pass found 915' % lv)
 
