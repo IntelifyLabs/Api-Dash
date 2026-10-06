@@ -40,6 +40,20 @@ CONSUMER = re.compile(
     r'\bmy account\b|\bwishlist\b|free (shipping|delivery)|buy (it )?now|'
     r'shop (now|online|all)', re.I)
 
+# A brand site that routes shoppers to dealers IS consumer facing, and the
+# first run missed that completely. Bonaldo, MDF Italia, Acerbis and Annibale
+# Colombo all came back "unclear" because the regex looked for a cart. High-end
+# Italian furniture has no cart anywhere: it markets hard to consumers and ends
+# the journey at a dealer locator. That is not ambiguity, it is the ideal
+# customer, since routing that shopper to a dealer is exactly what the lead
+# engine does.
+DEALER = re.compile(
+    r'find (a |your )?(dealer|retailer|stockist|store|showroom)|store ?locator|'
+    r'where to buy|dealer locator|find us|our (dealers|retailers|stockists|showrooms)|'
+    r'punti vendita|rivenditor|trova (il )?rivenditore|dove (siamo|acquistare)|'
+    r'h.ndler ?suche|fachh.ndler|distribuidor|revendedor|point de vente|'
+    r'revendeur|verkooppunt|showroom locator', re.I)
+
 TRADE = re.compile(
     r'trade only|to the trade\b|wholesale (only|enquir|inquir)|dealer (login|portal|area)|'
     r'reseller (login|portal)|b2b (portal|only|login)|retailer (login|area)|'
@@ -95,16 +109,47 @@ def probe(r):
     out['site_live'] = 'yes'
     out['final_url'] = final[:120]
     out['has_tryon'] = 'yes' if TRYON.search(body) else 'no'
-    cons, trade = bool(CONSUMER.search(body)), bool(TRADE.search(body))
-    out['sells_to'] = ('consumer' if cons and not trade else
-                       'trade only' if trade and not cons else
-                       'consumer and trade' if cons and trade else 'unclear')
+    shop, dealer, trade = (bool(CONSUMER.search(body)), bool(DEALER.search(body)),
+                           bool(TRADE.search(body)))
+    if shop:
+        out['sells_to'] = 'consumer, sells online'
+    elif dealer:
+        out['sells_to'] = 'consumer, via dealers'
+    elif trade:
+        out['sells_to'] = 'trade only'
+    else:
+        out['sells_to'] = 'unclear'
     q = QUOTE_META.search(body) or QUOTE_H1.search(body)
     if q:
         t = strip(q.group(1))
         if 12 <= len(t) <= 200:
             out['site_quote'] = t
     return out
+
+def reason(r):
+    """One line a human can read, so the file explains itself instead of
+    needing four columns decoded."""
+    if r['site_live'] == 'no site':
+        return 'No website on file, so nothing for a visualiser to sit on. Skip'
+    if r['site_live'] == 'unreachable':
+        return 'Site did not respond, check it by hand before spending a credit'
+    tryon = r['has_tryon'] == 'yes'
+    sells = r['sells_to']
+    who = {'consumer, sells online': 'sells direct to shoppers',
+           'consumer, via dealers': 'markets to shoppers and routes them to dealers',
+           'trade only': 'sells only to the trade',
+           'unclear': 'no clear shopper journey found'}[sells]
+    if tryon and sells.startswith('consumer'):
+        return ('Already runs a visualiser and %s, so the gap is what happens '
+                'after the render. Sharpest segment' % who)
+    if tryon:
+        return ('Already runs a visualiser but %s, so confirm there is a '
+                'shopper to capture' % who)
+    if sells == 'trade only':
+        return 'Sells only to the trade, so there is no shopper for the engine to capture'
+    if sells == 'unclear':
+        return 'Live site but no cart, dealer locator or trade signal found, needs a look'
+    return 'No visualiser yet and %s, so this is the full pitch rather than an upgrade' % who
 
 if __name__ == '__main__':
     rows = list(csv.DictReader(open('round3_companies.csv', encoding='utf-8-sig')))
@@ -115,12 +160,13 @@ if __name__ == '__main__':
         for r, res in zip(todo, ex.map(probe, todo)):
             r.update(res)
             r['email_pattern'] = pattern(r['email'])
+            r['reason'] = reason(r)
             done += 1
             if done % 100 == 0:
                 print('  %d/%d' % (done, len(todo)), flush=True)
     for r in rows:
         for k in ('site_live','final_url','has_tryon','sells_to','site_quote',
-                  'site_note','email_pattern'):
+                  'site_note','email_pattern','reason'):
             r.setdefault(k, '')
     cols = list(rows[0].keys())
     with open('round3_qualified.csv', 'w', newline='', encoding='utf-8-sig') as fh:
@@ -132,3 +178,7 @@ if __name__ == '__main__':
     print('sells_to :', dict(collections.Counter(r['sells_to'] for r in live)))
     print('quote captured:', sum(1 for r in live if r['site_quote']), 'of', len(live))
     print('email_pattern:', dict(collections.Counter(r['email_pattern'] for r in todo)))
+    print()
+    print('reason lines:')
+    for k, n in collections.Counter(r['reason'][:68] for r in todo).most_common():
+        print('  %4d  %s' % (n, k))
