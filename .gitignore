@@ -67,3 +67,6 @@ test-hive-storage
 
 # enrichment output, not source
 gtm/mec/wave2/copy/titles.csv
+
+# gate 5 page cache: 137MB of third-party html, regenerable by qualify_tools.py
+gtm/mec/wave3/html_cache/

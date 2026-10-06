@@ -155,6 +155,18 @@ def probe(r):
             return out
     out['site_live'] = 'yes'
     out['final_url'] = final[:120]
+    # WARNING: this value is provisional and gate 5 overwrites it.
+    #
+    # TRYON below carries a bare `configurator` alternative, and on this list
+    # that alternative does nearly all the work: of the 61 companies it marked
+    # yes on visible text, 54 matched the single word "configurator". A fabric or
+    # finish picker is not a room visualiser, but reason() below goes on to tell
+    # the reader "Already runs a visualiser", and segment C's email names their
+    # tool and asks what happens after the render. Both are false for a picker.
+    #
+    # qualify_tools.py recomputes has_tryon as exactly tool_level ADVANCED and
+    # rebuilds the reason lines. So if gate 4 is ever re-run, GATE 5 MUST BE RUN
+    # AFTER IT, or this column silently reverts to counting configurators.
     out['has_tryon'] = 'yes' if TRYON.search(body) else 'no'
     shop, dealer, trade = (bool(CONSUMER.search(body)), bool(DEALER.search(body)),
                            bool(TRADE.search(body)))
