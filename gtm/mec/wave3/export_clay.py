@@ -42,6 +42,24 @@ LEGAL = (r'\b(srl|s r l|spa|s p a|nv|bv|gmbh|co kg|ltd|llc|ltda|sasu|sas|as|a s|
 def norm(s):
     return re.sub(r'[^a-z0-9]', '', (s or '').lower())
 
+# Salone's API returns ISO-3 country codes; Heimtextil's returns full names. That
+# left Germany split across DEU (32 rows) and Germany (10), Italy across ITA and
+# Italy, and so on for 27 Heimtextil rows -- so a country filter in Clay would
+# silently drop part of each market. Normalised here, at the export, because the
+# upstream files legitimately hold what each directory actually said.
+ISO3 = {
+    'austria': 'AUT', 'belgium': 'BEL', 'estonia': 'EST', 'france': 'FRA',
+    'germany': 'DEU', 'great britain and northern ireland': 'GBR',
+    'hong kong': 'HKG', 'italy': 'ITA', 'morocco': 'MAR', 'poland': 'POL',
+    'spain': 'ESP', 'united states': 'USA',
+}
+
+def iso3(v):
+    v = (v or '').strip()
+    if len(v) == 3 and v.isupper():
+        return v
+    return ISO3.get(v.lower(), v)
+
 def host(r):
     raw = (r['final_url'] or r['website'] or '').split('//')[-1]
     return re.sub(r'^www\.', '', raw.split('/')[0]).strip().lower()
@@ -66,6 +84,7 @@ for r in keep:
     d = host(r)
     r['domain'] = d
     r['domain_matches_name'] = 'yes' if name_echoes_domain(r['company'], d) else 'brand'
+    r['country'] = iso3(r['country'])
 
 # Three domains appear twice, each the same company entered under both its legal
 # entity and its trading name, at the SAME stand number -- Mobilduenne srl /
@@ -110,3 +129,5 @@ print('clay_priority       ', dict(sorted(collections.Counter(r['clay_priority']
 print('studio              ', dict(collections.Counter(r['studio'] or '-' for r in keep)))
 print('already has email   ', sum(1 for r in keep if r['email'] or r['email2']))
 print('country, top 8      ', dict(collections.Counter(r['country'] for r in keep).most_common(8)))
+unnorm = [r['country'] for r in keep if not (len(r['country']) == 3 and r['country'].isupper())]
+print('country not ISO-3   ', dict(collections.Counter(unnorm)) or 'none, all normalised')
